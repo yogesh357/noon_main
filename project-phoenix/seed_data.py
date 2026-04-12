@@ -6,7 +6,7 @@ from uuid import uuid4
 
 import app.models  # noqa: F401
 from app.database import Base, async_session_factory, engine
-
+# hash of Password1234
 SEEDED_PASSWORD_HASH = "$argon2id$v=19$m=65536,t=3,p=4$kza5GX6CX1egedFtW11Yxw$qVjmj39ReD8venqcGkbeTbIPv2rWxzhphs5gHQldg60"
 
 
