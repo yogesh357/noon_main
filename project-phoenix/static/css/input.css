@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+/* Phoenix Design System — Inspired by Warby Parker (structure) + Uniqlo (visual) */
+
+@theme {
+  /* Brand Colors */
+  --color-brand-red: #c41230;
+  --color-brand-red-dark: #a00f28;
+  --color-brand-red-light: #e8354f;
+
+  /* Neutral Palette (Warby Parker inspired — grays, charcoal, whitespace) */
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #404040;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #171717;
+
+  /* Semantic Colors */
+  --color-success: #16a34a;
+  --color-warning: #ca8a04;
+  --color-error: #dc2626;
+  --color-info: #2563eb;
+
+  /* Typography */
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-heading: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+/* Base layer overrides */
+@layer base {
+  body {
+    @apply font-sans text-neutral-800 bg-white antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold tracking-tight;
+  }
+
+  a {
+    @apply text-neutral-800 hover:text-brand-red transition-colors duration-200;
+  }
+}
+
+/* Component layer */
+@layer components {
+  /* Warby Parker style animated floating label */
+  .form-field {
+    @apply relative;
+  }
+
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    @apply w-full px-4 py-3 border border-neutral-300 rounded-lg
+           text-neutral-800 bg-white
+           focus:outline-none focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red
+           transition-all duration-200;
+  }
+
+  .form-field label {
+    @apply absolute left-4 top-3 text-neutral-400
+           transition-all duration-200 pointer-events-none;
+  }
+
+  .form-field input:focus ~ label,
+  .form-field input:not(:placeholder-shown) ~ label,
+  .form-field textarea:focus ~ label,
+  .form-field textarea:not(:placeholder-shown) ~ label {
+    @apply -top-2.5 left-3 text-xs text-brand-red bg-white px-1;
+  }
+
+  /* Primary button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center
+           px-6 py-3 bg-neutral-900 text-white
+           font-medium rounded-lg
+           hover:bg-neutral-700 active:bg-neutral-800
+           focus:outline-none focus:ring-2 focus:ring-neutral-900/20
+           transition-all duration-200
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Secondary button */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center
+           px-6 py-3 bg-white text-neutral-800
+           font-medium rounded-lg border border-neutral-300
+           hover:bg-neutral-50 active:bg-neutral-100
+           focus:outline-none focus:ring-2 focus:ring-neutral-300/50
+           transition-all duration-200;
+  }
+
+  /* Danger button */
+  .btn-danger {
+    @apply inline-flex items-center justify-center
+           px-6 py-3 bg-error text-white
+           font-medium rounded-lg
+           hover:bg-red-700 active:bg-red-800
+           focus:outline-none focus:ring-2 focus:ring-error/20
+           transition-all duration-200;
+  }
+
+  /* Product card */
+  .product-card {
+    @apply relative bg-white rounded-lg overflow-hidden
+           transition-shadow duration-300 hover:shadow-lg;
+  }
+
+  .product-card .wishlist-btn {
+    @apply absolute top-3 right-3 z-10 p-2
+           bg-white/80 backdrop-blur-sm rounded-full
+           opacity-0
+           transition-opacity duration-200;
+  }
+
+  .product-card:hover .wishlist-btn {
+    @apply opacity-100;
+  }
+
+  /* Dashboard sidebar */
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-3
+           text-neutral-600 rounded-lg
+           hover:bg-neutral-100 hover:text-neutral-900
+           transition-all duration-200;
+  }
+
+  .sidebar-link.active {
+    @apply bg-neutral-100 text-neutral-900 font-medium;
+  }
+}

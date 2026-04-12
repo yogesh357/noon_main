@@ -1,0 +1,134 @@
+{% extends "base_checkout.html" %}
+
+{% block content %}
+<h1 class="text-2xl font-semibold mb-8 text-center">Checkout</h1>
+
+<form method="POST" action="/checkout" class="space-y-8" x-data="{ shippingCost: 15000 }">
+    <!-- Step 1: Shipping Address -->
+    <section>
+        <h2 class="text-lg font-medium mb-4 flex items-center gap-2">
+            <span class="w-7 h-7 bg-neutral-900 text-white rounded-full text-sm flex items-center justify-center">1</span>
+            Shipping Address
+        </h2>
+
+        {% if addresses %}
+        <div class="space-y-3">
+            {% for addr in addresses %}
+            <label class="block border border-neutral-200 rounded-lg p-4 cursor-pointer hover:border-neutral-400 transition-colors has-[:checked]:border-brand-red has-[:checked]:bg-red-50/30">
+                <div class="flex items-start gap-3">
+                    <input type="radio" name="address_id" value="{{ addr.id }}"
+                           class="mt-1" {{ 'checked' if addr.is_default or loop.first }}>
+                    <div>
+                        <p class="font-medium">{{ addr.full_name }}
+                            {% if addr.is_default %}<span class="text-xs text-brand-red ml-1">Default</span>{% endif %}
+                        </p>
+                        <p class="text-sm text-neutral-600 mt-1">{{ addr.street }}</p>
+                        <p class="text-sm text-neutral-600">{{ addr.city }}, {{ addr.province }} {{ addr.postal_code }}</p>
+                        <p class="text-sm text-neutral-500">{{ addr.phone }}</p>
+                    </div>
+                </div>
+            </label>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="border border-dashed border-neutral-300 rounded-lg p-6 text-center">
+            <p class="text-neutral-500 mb-3">No saved addresses</p>
+            <a href="/dashboard/addresses" class="text-brand-red hover:text-brand-red-dark text-sm font-medium">
+                Add an address first
+            </a>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- Step 2: Delivery -->
+    <section>
+        <h2 class="text-lg font-medium mb-4 flex items-center gap-2">
+            <span class="w-7 h-7 bg-neutral-900 text-white rounded-full text-sm flex items-center justify-center">2</span>
+            Delivery Method
+        </h2>
+
+        <div class="space-y-3">
+            <label class="block border border-neutral-200 rounded-lg p-4 cursor-pointer hover:border-neutral-400 transition-colors has-[:checked]:border-brand-red has-[:checked]:bg-red-50/30">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <input type="radio" name="courier" value="jnt" checked @change="shippingCost = 15000">
+                        <div>
+                            <p class="font-medium">J&T Express</p>
+                            <p class="text-sm text-neutral-500">Estimated 2-4 days</p>
+                        </div>
+                    </div>
+                    <p class="font-medium">Rp 15,000</p>
+                </div>
+            </label>
+            <label class="block border border-neutral-200 rounded-lg p-4 cursor-pointer hover:border-neutral-400 transition-colors has-[:checked]:border-brand-red has-[:checked]:bg-red-50/30">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <input type="radio" name="courier" value="jne" @change="shippingCost = 12000">
+                        <div>
+                            <p class="font-medium">JNE Regular</p>
+                            <p class="text-sm text-neutral-500">Estimated 3-5 days</p>
+                        </div>
+                    </div>
+                    <p class="font-medium">Rp 12,000</p>
+                </div>
+            </label>
+            <label class="block border border-neutral-200 rounded-lg p-4 cursor-pointer hover:border-neutral-400 transition-colors has-[:checked]:border-brand-red has-[:checked]:bg-red-50/30">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <input type="radio" name="courier" value="sicepat" @change="shippingCost = 14000">
+                        <div>
+                            <p class="font-medium">SiCepat REG</p>
+                            <p class="text-sm text-neutral-500">Estimated 2-3 days</p>
+                        </div>
+                    </div>
+                    <p class="font-medium">Rp 14,000</p>
+                </div>
+            </label>
+
+            <input type="hidden" name="shipping_cost" :value="shippingCost">
+        </div>
+    </section>
+
+    <!-- Step 3: Notes -->
+    <section>
+        <h2 class="text-lg font-medium mb-4 flex items-center gap-2">
+            <span class="w-7 h-7 bg-neutral-900 text-white rounded-full text-sm flex items-center justify-center">3</span>
+            Notes (Optional)
+        </h2>
+        <textarea name="notes" rows="2" placeholder="Any special instructions..."
+                  class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red text-sm"></textarea>
+    </section>
+
+    <!-- Order Summary -->
+    <section class="bg-neutral-50 rounded-lg p-6">
+        <h2 class="text-lg font-medium mb-4">Order Summary</h2>
+        <div class="space-y-3">
+            {% for item in cart.items %}
+            <div class="flex justify-between text-sm">
+                <span class="text-neutral-600">{{ item.product_name }} x {{ item.quantity }}</span>
+                <span>Rp {{ "{:,.0f}".format(item.line_total) }}</span>
+            </div>
+            {% endfor %}
+            <div class="border-t border-neutral-200 pt-3 mt-3">
+                <div class="flex justify-between text-sm">
+                    <span class="text-neutral-600">Subtotal</span>
+                    <span>Rp {{ "{:,.0f}".format(cart.subtotal) }}</span>
+                </div>
+                <div class="flex justify-between text-sm mt-1">
+                    <span class="text-neutral-600">Shipping</span>
+                    <span>Rp <span x-text="shippingCost.toLocaleString('id-ID')">15,000</span></span>
+                </div>
+                <div class="flex justify-between font-semibold text-lg mt-3">
+                    <span>Total</span>
+                    <span>Rp <span x-text="({{ cart.subtotal }} + shippingCost).toLocaleString('id-ID')">{{ "{:,.0f}".format(cart.subtotal + 15000) }}</span></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Submit -->
+    <button type="submit" class="btn-primary w-full text-lg py-4" {{ 'disabled' if not addresses }}>
+        Pay Now
+    </button>
+</form>
+{% endblock %}

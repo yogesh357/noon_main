@@ -1,0 +1,68 @@
+{% extends "base_warehouse.html" %}
+
+{% block page_title %}Package Handover{% endblock %}
+
+{% block content %}
+<div class="grid lg:grid-cols-2 gap-6">
+    <!-- Left: Ready to Ship -->
+    <div>
+        <h2 class="text-xl font-semibold mb-4">
+            Ready to Ship
+            <span class="text-neutral-400 font-normal text-base">({{ ready_orders | length }})</span>
+        </h2>
+
+        <!-- Scan Input -->
+        <form hx-post="/api/warehouse/handover/scan"
+              hx-target="#handover-status"
+              hx-swap="innerHTML"
+              class="mb-4">
+            <div class="flex gap-3">
+                <input type="text" name="order_number" placeholder="Scan order barcode..."
+                       autofocus autocomplete="off"
+                       class="flex-1 px-4 py-4 text-lg border-2 border-neutral-300 rounded-lg focus:border-blue-500 focus:outline-none font-mono">
+                <button type="submit" class="px-6 py-4 bg-blue-600 text-white rounded-lg text-lg font-medium hover:bg-blue-700">
+                    Scan
+                </button>
+            </div>
+        </form>
+
+        {% if ready_orders %}
+        <div class="space-y-2 max-h-[60vh] overflow-y-auto">
+            {% for order in ready_orders %}
+            <div class="bg-white border border-neutral-200 rounded-lg p-3 flex items-center justify-between">
+                <div>
+                    <p class="font-medium">{{ order.order_number }}</p>
+                    <p class="text-xs text-neutral-500">{{ (order.courier or 'N/A') | upper }} &middot; {{ order.items | length }} item(s)</p>
+                </div>
+                <span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-700 rounded-full">Waiting</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-center py-8 text-neutral-400">No packages ready to ship</p>
+        {% endif %}
+    </div>
+
+    <!-- Right: Shipped (scanned) -->
+    <div>
+        <h2 class="text-xl font-semibold mb-4">
+            Shipped
+            <span class="text-neutral-400 font-normal text-base">({{ progress.scanned }})</span>
+        </h2>
+
+        <div id="handover-status">
+            {% include "warehouse/_handover_status.html" %}
+        </div>
+
+        {% if progress.scanned > 0 %}
+        <button
+            class="w-full mt-4 bg-green-600 text-white px-6 py-4 rounded-lg text-lg font-semibold hover:bg-green-700 transition-colors"
+            hx-post="/api/warehouse/handover/complete/{{ batch.id }}"
+            hx-swap="none"
+        >
+            Complete Handover ({{ progress.scanned }} packages)
+        </button>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

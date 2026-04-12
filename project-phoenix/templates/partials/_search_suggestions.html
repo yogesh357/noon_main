@@ -1,0 +1,19 @@
+<!-- Search Suggestions (HTMX partial) -->
+{% if products %}
+<div class="absolute top-full left-0 right-0 bg-white border border-neutral-200 rounded-lg shadow-lg mt-1 z-50 max-h-80 overflow-y-auto">
+    {% for product in products %}
+    {% set name = product.name_en if language == 'en' else product.name_id %}
+    {% set image = product.images[0].image_url if product.images else '/static/images/placeholder.svg' %}
+    <a href="/products/{{ product.slug }}" class="flex items-center gap-3 px-4 py-3 hover:bg-neutral-50 transition-colors">
+        <img src="{{ image }}" alt="{{ name }}" class="w-10 h-10 rounded object-cover bg-neutral-100">
+        <div>
+            <p class="text-sm font-medium text-neutral-900">{{ name }}</p>
+            <p class="text-xs text-neutral-500">Rp {{ "{:,.0f}".format(product.base_price) }}</p>
+        </div>
+    </a>
+    {% endfor %}
+    <a href="/search?q={{ query }}" class="block px-4 py-3 text-sm text-brand-red text-center border-t border-neutral-100 hover:bg-neutral-50">
+        View all results for "{{ query }}"
+    </a>
+</div>
+{% endif %}

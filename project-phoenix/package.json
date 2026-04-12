@@ -1,0 +1,12 @@
+{
+  "name": "project-phoenix-frontend",
+  "private": true,
+  "scripts": {
+    "dev": "npx @tailwindcss/cli -i ./static/css/input.css -o ./static/css/output.css --watch",
+    "build": "npx @tailwindcss/cli -i ./static/css/input.css -o ./static/css/output.css --minify"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.0.0",
+    "tailwindcss": "^4.0.0"
+  }
+}

@@ -1,0 +1,6 @@
+<!-- Stock status badge (HTMX polled) -->
+{% if in_stock %}
+<span class="text-sm text-success font-medium">In Stock ({{ total_stock }} available)</span>
+{% else %}
+<span class="text-sm text-error font-medium">Out of Stock</span>
+{% endif %}

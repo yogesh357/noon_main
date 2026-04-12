@@ -1,0 +1,4 @@
+<!-- Cart Badge (HTMX swappable) -->
+<span id="cart-badge" class="{{ 'hidden' if cart_count == 0 else 'absolute -top-1 -right-1 bg-brand-red text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-medium' }}">
+    {{ cart_count }}
+</span>

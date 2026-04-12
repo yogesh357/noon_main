@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-16 text-center">
+    <!-- Success Icon -->
+    <div class="w-20 h-20 mx-auto mb-6 bg-green-100 rounded-full flex items-center justify-center">
+        <svg class="w-10 h-10 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+    </div>
+
+    <h1 class="text-3xl font-semibold mb-3">Order Confirmed!</h1>
+    <p class="text-neutral-600 mb-8">Thank you for your purchase. We'll notify you when your order ships.</p>
+
+    <!-- Order Details Card -->
+    <div class="bg-neutral-50 rounded-lg p-6 text-left mb-8">
+        <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+                <p class="text-neutral-500">Order Number</p>
+                <p class="font-semibold text-neutral-900">{{ order.order_number }}</p>
+            </div>
+            <div>
+                <p class="text-neutral-500">Status</p>
+                <p class="font-semibold text-neutral-900 capitalize">{{ order.status.value | replace('_', ' ') }}</p>
+            </div>
+            <div>
+                <p class="text-neutral-500">Total</p>
+                <p class="font-semibold text-neutral-900">Rp {{ "{:,.0f}".format(order.total) }}</p>
+            </div>
+            {% if order.courier %}
+            <div>
+                <p class="text-neutral-500">Courier</p>
+                <p class="font-semibold text-neutral-900 uppercase">{{ order.courier }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Items -->
+        <div class="mt-6 border-t border-neutral-200 pt-4">
+            <p class="text-sm text-neutral-500 mb-3">Items</p>
+            {% for item in order.items %}
+            <div class="flex justify-between text-sm py-1">
+                <span>{{ item.product_name_snapshot }} ({{ item.sku_snapshot }}) x {{ item.quantity }}</span>
+                <span>Rp {{ "{:,.0f}".format(item.unit_price * item.quantity) }}</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if order.shipping_address %}
+        <div class="mt-6 border-t border-neutral-200 pt-4">
+            <p class="text-sm text-neutral-500 mb-2">Ship to</p>
+            <p class="text-sm font-medium">{{ order.shipping_address.get('full_name', '') }}</p>
+            <p class="text-sm text-neutral-600">{{ order.shipping_address.get('street', '') }}</p>
+            <p class="text-sm text-neutral-600">{{ order.shipping_address.get('city', '') }}, {{ order.shipping_address.get('province', '') }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/dashboard/orders" class="btn-secondary">View My Orders</a>
+        <a href="/products" class="btn-primary">Continue Shopping</a>
+    </div>
+</div>
+{% endblock %}

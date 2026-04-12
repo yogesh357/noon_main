@@ -1,0 +1,37 @@
+{% if addresses %}
+<div class="grid sm:grid-cols-2 gap-4">
+    {% for addr in addresses %}
+    <div class="bg-white border {{ 'border-brand-red' if addr.is_default else 'border-neutral-200' }} rounded-lg p-4">
+        <div class="flex items-start justify-between mb-2">
+            <div>
+                <span class="text-sm font-medium">{{ addr.label }}</span>
+                {% if addr.is_default %}
+                <span class="ml-2 text-xs text-brand-red font-medium">Default</span>
+                {% endif %}
+            </div>
+            <div class="flex gap-2">
+                {% if not addr.is_default %}
+                <button
+                    class="text-xs text-neutral-400 hover:text-neutral-600"
+                    hx-post="/api/dashboard/addresses/{{ addr.id }}/default"
+                    hx-target="#address-list" hx-swap="innerHTML"
+                >Set Default</button>
+                {% endif %}
+                <button
+                    class="text-xs text-error hover:text-red-700"
+                    hx-delete="/api/dashboard/addresses/{{ addr.id }}"
+                    hx-target="#address-list" hx-swap="innerHTML"
+                    hx-confirm="Delete this address?"
+                >Delete</button>
+            </div>
+        </div>
+        <p class="text-sm font-medium">{{ addr.full_name }}</p>
+        <p class="text-sm text-neutral-600">{{ addr.street }}</p>
+        <p class="text-sm text-neutral-600">{{ addr.city }}, {{ addr.province }} {{ addr.postal_code }}</p>
+        <p class="text-sm text-neutral-500">{{ addr.phone }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-center py-8 text-neutral-400">No addresses saved</p>
+{% endif %}

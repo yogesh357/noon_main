@@ -1,0 +1,76 @@
+[project]
+name = "project-phoenix"
+version = "0.1.0"
+description = "E-commerce platform with omnichannel, logistics, and competitive intelligence"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    # FastAPI & Server
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.34.0",
+    "gunicorn>=23.0.0",
+    "python-multipart>=0.0.18",
+    # Database & ORM
+    "sqlalchemy[asyncio]>=2.0.36",
+    "asyncpg>=0.30.0",
+    "alembic>=1.14.0",
+    # Auth
+    "fastapi-users[sqlalchemy]>=14.0.0",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    # Templates & Frontend
+    "jinja2>=3.1.4",
+    "aiofiles>=24.1.0",
+    # Redis & Caching
+    "redis>=5.2.0",
+    # Task Queue
+    "celery[redis]>=5.4.0",
+    # Admin Panel
+    "sqladmin>=0.20.0",
+    # Sessions
+    "starsessions[redis]>=2.1.0",
+    # HTTP Client
+    "httpx>=0.28.0",
+    # Validation & Settings
+    "pydantic>=2.10.0",
+    "pydantic-settings>=2.7.0",
+    # Rate Limiting
+    "slowapi>=0.1.9",
+    # Email
+    "fastapi-mail>=1.4.2",
+    # i18n
+    "babel>=2.16.0",
+    # Image Processing
+    "pillow>=11.0.0",
+    # PDF Generation
+    "weasyprint>=63.0",
+    # Barcode
+    "python-barcode>=0.15.1",
+    # Payment
+    "xendit-python>=7.0.0",
+    # Monitoring
+    "sentry-sdk[fastapi]>=2.19.0",
+    # Security
+    "python-dotenv>=1.0.1",
+    "aiosqlite>=0.22.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.24.0",
+    "httpx>=0.28.0",
+    "factory-boy>=3.3.1",
+    "ruff>=0.8.0",
+]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

@@ -1,0 +1,63 @@
+{% extends "admin/layout.html" %}
+
+{% block admin_content %}
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-semibold">Order Management</h1>
+    <span class="text-sm text-neutral-500">{{ total }} orders</span>
+</div>
+
+<!-- Status Tabs -->
+<div class="flex gap-2 mb-4 overflow-x-auto pb-2">
+    {% set statuses = [('', 'All'), ('pending_payment', 'Pending Payment'), ('accepted', 'Accepted'), ('processing', 'Processing'), ('ready_to_ship', 'Ready to Ship'), ('shipped', 'Shipped'), ('delivered', 'Delivered'), ('completed', 'Completed')] %}
+    {% for value, label in statuses %}
+    <a href="/admin-panel/orders{% if value %}?status={{ value }}{% endif %}"
+       class="px-3 py-1.5 text-sm rounded-full whitespace-nowrap
+              {{ 'bg-neutral-900 text-white' if current_status == value or (not current_status and not value) else 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200' }}"
+       hx-get="/admin-panel/orders{% if value %}?status={{ value }}{% endif %}"
+       hx-target="#order-queue" hx-push-url="true">
+        {{ label }}
+    </a>
+    {% endfor %}
+</div>
+
+<!-- Bulk Actions -->
+<form id="bulk-form">
+    <div class="flex gap-2 mb-4">
+        <button type="button" class="btn-primary text-sm"
+                hx-post="/admin-panel/orders/bulk-process"
+                hx-include="#order-queue input[name='order_ids']"
+                hx-target="#order-queue" hx-swap="innerHTML">
+            Process Selected
+        </button>
+        <button type="button" class="btn-secondary text-sm"
+                hx-post="/admin-panel/orders/print-labels"
+                hx-include="#order-queue input[name='order_ids']"
+                hx-swap="none"
+                onclick="
+                    const ids = [...document.querySelectorAll('input[name=order_ids]:checked')].map(el => el.value);
+                    if (ids.length) {
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '/admin-panel/orders/print-labels';
+                        form.target = '_blank';
+                        ids.forEach(id => {
+                            const input = document.createElement('input');
+                            input.name = 'order_ids';
+                            input.value = id;
+                            form.appendChild(input);
+                        });
+                        document.body.appendChild(form);
+                        form.submit();
+                        form.remove();
+                    }
+                    return false;
+                ">
+            Print Labels
+        </button>
+    </div>
+
+    <div id="order-queue">
+        {% include "admin/_order_queue.html" %}
+    </div>
+</form>
+{% endblock %}

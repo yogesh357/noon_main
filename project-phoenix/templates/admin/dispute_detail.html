@@ -1,0 +1,107 @@
+{% extends "admin/layout.html" %}
+
+{% block admin_content %}
+<div class="mb-4">
+    <a href="/admin-panel/disputes" class="text-sm text-neutral-500 hover:text-neutral-900">&larr; Back to Disputes</a>
+</div>
+
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-semibold">Dispute #{{ dispute.id }}</h1>
+    <span class="px-3 py-1 text-sm rounded-full
+        {% if dispute.status == 'resolved' %}bg-green-100 text-green-700
+        {% elif dispute.status == 'rejected' %}bg-red-100 text-red-700
+        {% elif dispute.status == 'under_review' %}bg-yellow-100 text-yellow-700
+        {% else %}bg-blue-100 text-blue-700{% endif %}">
+        {{ dispute.status | replace('_', ' ') | title }}
+    </span>
+</div>
+
+<div class="grid lg:grid-cols-2 gap-6">
+    <!-- Left: Customer Evidence -->
+    <div class="space-y-4">
+        <div class="bg-white border border-neutral-200 rounded-lg p-4">
+            <h3 class="font-semibold text-sm mb-3">Customer Dispute</h3>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between"><span class="text-neutral-500">Order</span><span class="font-medium">{{ dispute.order.order_number if dispute.order else 'N/A' }}</span></div>
+                <div class="flex justify-between"><span class="text-neutral-500">Type</span><span class="capitalize">{{ dispute.type }}</span></div>
+                <div class="flex justify-between"><span class="text-neutral-500">Reason</span><span class="capitalize">{{ dispute.reason | replace('_', ' ') }}</span></div>
+                {% if dispute.sla_deadline %}
+                <div class="flex justify-between"><span class="text-neutral-500">SLA Deadline</span><span class="font-medium">{{ dispute.sla_deadline.strftime('%d %b %Y %H:%M') }}</span></div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="bg-white border border-neutral-200 rounded-lg p-4">
+            <h3 class="font-semibold text-sm mb-3">Description</h3>
+            <p class="text-sm text-neutral-700">{{ dispute.description }}</p>
+        </div>
+
+        {% if dispute.evidence %}
+        <div class="bg-white border border-neutral-200 rounded-lg p-4">
+            <h3 class="font-semibold text-sm mb-3">Evidence ({{ dispute.evidence | length }})</h3>
+            <div class="space-y-2">
+                {% for ev in dispute.evidence %}
+                <div class="flex items-center gap-3 p-2 bg-neutral-50 rounded">
+                    <svg class="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                    <span class="text-sm">{{ ev.description or ev.file_url }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Right: Order Info + Resolution Form -->
+    <div class="space-y-4">
+        {% if dispute.order %}
+        <div class="bg-white border border-neutral-200 rounded-lg p-4">
+            <h3 class="font-semibold text-sm mb-3">Order Details</h3>
+            <div class="text-sm space-y-1">
+                <p><span class="text-neutral-500">Order:</span> <a href="/admin-panel/orders/{{ dispute.order.order_number }}" class="text-brand-red">{{ dispute.order.order_number }}</a></p>
+                <p><span class="text-neutral-500">Total:</span> Rp {{ "{:,.0f}".format(dispute.order.total) }}</p>
+                <p><span class="text-neutral-500">Source:</span> {{ dispute.order.source.value | title }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if dispute.status in ('open', 'under_review') %}
+        <!-- Resolution Form -->
+        <div class="bg-white border-2 border-brand-red rounded-lg p-4">
+            <h3 class="font-semibold text-sm mb-3">Resolve Dispute</h3>
+            <form method="POST" action="/api/disputes/{{ dispute.id }}/resolve" class="space-y-3">
+                <div>
+                    <label class="block text-sm text-neutral-600 mb-1">Resolution</label>
+                    <select name="resolution_type" required class="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm">
+                        <option value="refund">Refund</option>
+                        <option value="replacement">Replacement</option>
+                        <option value="rejected">Reject</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-neutral-600 mb-1">Resolution Notes (visible to customer)</label>
+                    <textarea name="resolution_notes" rows="3" required
+                              class="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm text-neutral-600 mb-1">Admin Notes (internal only)</label>
+                    <textarea name="admin_notes" rows="2"
+                              class="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm"></textarea>
+                </div>
+                <button type="submit" class="btn-primary w-full">Submit Resolution</button>
+            </form>
+        </div>
+        {% elif dispute.resolution_type %}
+        <div class="bg-white border border-neutral-200 rounded-lg p-4">
+            <h3 class="font-semibold text-sm mb-3">Resolution</h3>
+            <p class="text-sm font-medium capitalize">{{ dispute.resolution_type }}</p>
+            {% if dispute.resolution_notes %}
+            <p class="text-sm text-neutral-600 mt-2">{{ dispute.resolution_notes }}</p>
+            {% endif %}
+            {% if dispute.admin_notes %}
+            <p class="text-sm text-neutral-400 mt-2 italic">Internal: {{ dispute.admin_notes }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

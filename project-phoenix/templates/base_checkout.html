@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="{{ language|default('id') }}" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Checkout{% endblock %} — Project Phoenix</title>
+    <link rel="stylesheet" href="/static/css/output.css">
+    <script src="/static/js/htmx.min.js" defer></script>
+    <script src="/static/js/alpine.min.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    {% block head_extra %}{% endblock %}
+</head>
+<body class="min-h-screen flex flex-col bg-neutral-50">
+
+    <!-- Simplified checkout header — Warby Parker pattern: logo only -->
+    <header class="bg-white border-b border-neutral-200">
+        <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-center">
+            <a href="/">
+                <span class="text-xl font-bold tracking-tight text-neutral-900">PHOENIX</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Checkout content -->
+    <main class="flex-1 max-w-3xl mx-auto w-full px-4 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Minimal footer -->
+    <footer class="border-t border-neutral-200 bg-white">
+        <div class="max-w-3xl mx-auto px-4 py-4 text-center text-xs text-neutral-400">
+            Secure checkout powered by Xendit &middot; &copy; 2026 Project Phoenix
+        </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

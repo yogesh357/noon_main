@@ -1,0 +1,28 @@
+<!-- Handover scan results (HTMX swappable) -->
+{% if result is defined and result %}
+<div class="mb-3 p-3 rounded-lg text-sm font-medium {{ 'bg-green-100 text-green-700' if result.success else 'bg-red-100 text-red-700' }}">
+    {% if result.success %}
+        &#10004; {{ result.message }}
+    {% else %}
+        &#10008; {{ result.message }}
+    {% endif %}
+</div>
+{% endif %}
+
+{% if progress.items %}
+<div class="space-y-2 max-h-[60vh] overflow-y-auto">
+    {% for item in progress.items %}
+    <div class="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center justify-between">
+        <div>
+            <p class="font-medium text-green-800">{{ item.order_number }}</p>
+            <p class="text-xs text-green-600">{{ item.courier | upper }}</p>
+        </div>
+        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-center py-8 text-neutral-400">Scan packages to add them here</p>
+{% endif %}

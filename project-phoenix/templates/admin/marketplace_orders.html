@@ -1,0 +1,65 @@
+{% extends "admin/layout.html" %}
+
+{% block admin_content %}
+<h1 class="text-2xl font-semibold mb-6">Marketplace Orders</h1>
+
+<!-- Source Tabs -->
+<div class="flex gap-2 mb-6">
+    {% set sources = [('', 'All'), ('shopee', 'Shopee'), ('tokopedia', 'Tokopedia'), ('tiktok', 'TikTok'), ('lazada', 'Lazada')] %}
+    {% for value, label in sources %}
+    <a href="/admin-panel/marketplace-orders{% if value %}?source={{ value }}{% endif %}"
+       class="px-3 py-1.5 text-sm rounded-full
+              {{ 'bg-neutral-900 text-white' if current_source == value or (not current_source and not value) else 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200' }}">
+        {{ label }}
+    </a>
+    {% endfor %}
+</div>
+
+{% if orders %}
+<div class="bg-white border border-neutral-200 rounded-lg overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-neutral-50 text-neutral-500">
+            <tr>
+                <th class="text-left p-3 font-medium">Order</th>
+                <th class="text-left p-3 font-medium">Source</th>
+                <th class="text-left p-3 font-medium hidden sm:table-cell">Date</th>
+                <th class="text-left p-3 font-medium">Status</th>
+                <th class="text-right p-3 font-medium">Total</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-neutral-100">
+            {% for order in orders %}
+            <tr class="hover:bg-neutral-50">
+                <td class="p-3">
+                    <a href="/admin-panel/orders/{{ order.order_number }}" class="font-medium text-brand-red hover:text-brand-red-dark">
+                        {{ order.order_number }}
+                    </a>
+                </td>
+                <td class="p-3">
+                    <span class="px-2 py-0.5 text-xs rounded-full
+                        {% if order.source.value == 'shopee' %}bg-orange-100 text-orange-700
+                        {% elif order.source.value == 'tokopedia' %}bg-green-100 text-green-700
+                        {% elif order.source.value == 'tiktok' %}bg-pink-100 text-pink-700
+                        {% elif order.source.value == 'lazada' %}bg-blue-100 text-blue-700
+                        {% endif %}">
+                        {{ order.source.value | title }}
+                    </span>
+                </td>
+                <td class="p-3 text-neutral-500 hidden sm:table-cell">
+                    {{ order.created_at.strftime('%d %b %H:%M') if order.created_at else '' }}
+                </td>
+                <td class="p-3">
+                    <span class="px-2 py-0.5 text-xs rounded-full bg-neutral-100 text-neutral-600">
+                        {{ order.status.value | replace('_', ' ') | title }}
+                    </span>
+                </td>
+                <td class="p-3 text-right font-medium">Rp {{ "{:,.0f}".format(order.total) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="text-center py-12 text-neutral-400">No marketplace orders found</div>
+{% endif %}
+{% endblock %}
