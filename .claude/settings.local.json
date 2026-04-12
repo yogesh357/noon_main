@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls c:/Users/ACER/Downloads/noon-main/project-phoenix/.env*)",
+      "Bash(pip install:*)"
+    ]
+  }
+}
