@@ -6,16 +6,16 @@ import { useAppDispatch } from '../../app/hooks'
 import { formatIDR } from '../../utils/currency'
 import type { Order } from '../../types'
 
-const STATUS_COLORS: Record<string, string> = {
-  PENDING_PAYMENT: 'bg-yellow-100 text-yellow-800',
-  ACCEPTED: 'bg-blue-100 text-blue-800',
-  PROCESSING: 'bg-blue-100 text-blue-800',
-  PICKING: 'bg-indigo-100 text-indigo-800',
-  PACKING: 'bg-indigo-100 text-indigo-800',
-  READY_TO_SHIP: 'bg-purple-100 text-purple-800',
-  SHIPPED: 'bg-indigo-100 text-indigo-800',
-  DELIVERED: 'bg-green-100 text-green-800',
-  CANCELLED: 'bg-red-100 text-red-800',
+const STATUS_CLASSES: Record<string, string> = {
+  PENDING_PAYMENT: 'status-pending',
+  ACCEPTED: 'status-processing',
+  PROCESSING: 'status-processing',
+  PICKING: 'status-shipped',
+  PACKING: 'status-shipped',
+  READY_TO_SHIP: 'status-delivered',
+  SHIPPED: 'status-shipped',
+  DELIVERED: 'status-delivered',
+  CANCELLED: 'status-cancelled',
 }
 
 export default function AdminOrdersPage() {
@@ -77,70 +77,128 @@ export default function AdminOrdersPage() {
   }
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-neutral-900">Order Queue</h1>
-        {selected.size > 0 && (
-          <button onClick={bulkProcess} disabled={processing} className="btn-primary text-sm py-2">
-            {processing ? 'Processing...' : `Accept ${selected.size} Order(s)`}
-          </button>
-        )}
+    <div className="space-y-6 max-w-7xl mx-auto pb-10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <header className="flex flex-col gap-1">
+          <h1 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
+            Order <span className="text-gradient">Queue</span>
+          </h1>
+          <p className="text-neutral-500 text-sm">Manage and process your incoming orders.</p>
+        </header>
+        
+        <div className="flex items-center gap-3">
+          {selected.size > 0 && (
+            <button 
+              onClick={bulkProcess} 
+              disabled={processing} 
+              className="btn-primary"
+            >
+              {processing ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Processing...
+                </span>
+              ) : (
+                `Accept ${selected.size} Selected`
+              )}
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden">
+      <div className="data-table-container">
         {loading ? (
-          <div className="p-6 space-y-3">{[...Array(5)].map((_, i) => <div key={i} className="skeleton h-12 rounded-lg" />)}</div>
+          <div className="p-8 space-y-4">
+            {[...Array(6)].map((_, i) => <div key={i} className="skeleton h-14 rounded-xl" />)}
+          </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-neutral-50 border-b border-neutral-200">
-              <tr>
-                <th className="px-4 py-3 text-left">
-                  <input type="checkbox" checked={selected.size === orders.length && orders.length > 0}
-                    onChange={toggleSelectAll} className="rounded border-neutral-300" />
-                </th>
-                <th className="px-4 py-3 text-left font-medium text-neutral-700">Order</th>
-                <th className="px-4 py-3 text-left font-medium text-neutral-700 hidden md:table-cell">Source</th>
-                <th className="px-4 py-3 text-left font-medium text-neutral-700">Status</th>
-                <th className="px-4 py-3 text-right font-medium text-neutral-700">Total</th>
-                <th className="px-4 py-3 text-left font-medium text-neutral-700">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-100">
-              {orders.map((order) => (
-                <tr key={order.id} className="hover:bg-neutral-50 transition-colors">
-                  <td className="px-4 py-3">
-                    <input type="checkbox" checked={selected.has(order.id)}
-                      onChange={() => toggleSelect(order.id)} className="rounded border-neutral-300" />
-                  </td>
-                  <td className="px-4 py-3">
-                    <Link to={`/admin-panel/orders/${order.id}`} className="font-medium text-neutral-900 hover:text-brand-red">
-                      #{order.order_number}
-                    </Link>
-                    <p className="text-xs text-neutral-400">{new Date(order.created_at).toLocaleDateString('id-ID')}</p>
-                  </td>
-                  <td className="px-4 py-3 hidden md:table-cell">
-                    <span className="badge bg-neutral-100 text-neutral-600">{order.source}</span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`badge ${STATUS_COLORS[order.status]}`}>{order.status.replace(/_/g, ' ')}</span>
-                  </td>
-                  <td className="px-4 py-3 text-right font-semibold">{formatIDR(order.total)}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-2">
-                      <Link to={`/admin-panel/orders/${order.id}`} className="text-xs text-brand-red hover:text-brand-red-dark">View</Link>
-                      <button onClick={() => downloadLabel(order.id)} className="text-xs text-neutral-500 hover:text-neutral-900">Label</button>
-                    </div>
-                  </td>
+          <div className="overflow-x-auto scrollbar-hide">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-neutral-50/50 border-b border-neutral-100">
+                  <th className="px-6 py-4 text-left w-10">
+                    <input 
+                      type="checkbox" 
+                      checked={selected.size === orders.length && orders.length > 0}
+                      onChange={toggleSelectAll} 
+                      className="rounded border-neutral-300 text-primary-600 focus:ring-primary-500 transition-all" 
+                    />
+                  </th>
+                  <th className="px-6 py-4 text-left font-semibold text-neutral-600 uppercase tracking-wider text-[10px]">Order Details</th>
+                  <th className="px-6 py-4 text-left font-semibold text-neutral-600 uppercase tracking-wider text-[10px] hidden md:table-cell">Source</th>
+                  <th className="px-6 py-4 text-left font-semibold text-neutral-600 uppercase tracking-wider text-[10px]">Status</th>
+                  <th className="px-6 py-4 text-right font-semibold text-neutral-600 uppercase tracking-wider text-[10px]">Total Amount</th>
+                  <th className="px-6 py-4 text-right font-semibold text-neutral-600 uppercase tracking-wider text-[10px]">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-neutral-50">
+                {orders.map((order) => (
+                  <tr key={order.id} className="data-table-row group">
+                    <td className="px-6 py-4">
+                      <input 
+                        type="checkbox" 
+                        checked={selected.has(order.id)}
+                        onChange={() => toggleSelect(order.id)} 
+                        className="rounded border-neutral-300 text-primary-600 focus:ring-primary-500 transition-all" 
+                      />
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <Link to={`/admin-panel/orders/${order.id}`} className="font-bold text-neutral-900 hover:text-primary-600 transition-colors">
+                          #{order.order_number}
+                        </Link>
+                        <span className="text-xs text-neutral-400 mt-0.5">{new Date(order.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 hidden md:table-cell">
+                      <span className="px-2.5 py-1 rounded-lg bg-neutral-100 text-neutral-600 text-[10px] font-bold uppercase tracking-wide border border-neutral-200">
+                        {order.source}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={STATUS_CLASSES[order.status] || 'badge bg-neutral-100'}>
+                        {order.status.replace(/_/g, ' ')}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right font-black text-neutral-900">{formatIDR(order.total)}</td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                        <Link to={`/admin-panel/orders/${order.id}`} className="p-2 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 transition-colors">
+                          <span className="text-xs font-bold uppercase tracking-tighter">View</span>
+                        </Link>
+                        <button onClick={() => downloadLabel(order.id)} className="p-2 rounded-lg bg-neutral-50 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900 transition-colors">
+                          <span className="text-xs font-bold uppercase tracking-tighter">Label</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
-      <div className="flex justify-between">
-        <button disabled={page === 1} onClick={() => setPage(page - 1)} className="btn-secondary text-sm py-2 px-4">Previous</button>
-        <button disabled={orders.length < 10} onClick={() => setPage(page + 1)} className="btn-secondary text-sm py-2 px-4">Next</button>
+      <div className="flex items-center justify-between pt-4">
+        <button 
+          disabled={page === 1} 
+          onClick={() => setPage(page - 1)} 
+          className="btn-secondary px-4 py-2 text-xs"
+        >
+          Previous
+        </button>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-neutral-400 bg-neutral-50 px-3 py-1 rounded-full border border-neutral-100">
+            Page {page}
+          </span>
+        </div>
+        <button 
+          disabled={orders.length < 10} 
+          onClick={() => setPage(page + 1)} 
+          className="btn-secondary px-4 py-2 text-xs"
+        >
+          Next
+        </button>
       </div>
     </div>
   )

@@ -22,7 +22,7 @@ class Cart(Base):
     )
 
     items: Mapped[list["CartItem"]] = relationship(
-        back_populates="cart", cascade="all, delete-orphan"
+        back_populates="cart", cascade="all, delete-orphan", lazy="selectin"
     )
 
 
