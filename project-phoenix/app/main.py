@@ -40,7 +40,12 @@ def create_app() -> FastAPI:
     app.add_middleware(I18nMiddleware)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+        allow_origins=[
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+        ],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -85,10 +90,6 @@ def _register_routers(app: FastAPI) -> None:
     from app.routers.api import payments as payments_api
 
     app.include_router(payments_api.router)
-
-    from app.routers.api import disputes as disputes_api
-
-    app.include_router(disputes_api.router)
 
     from app.routers.api import react_frontend as react_frontend_api
 
@@ -173,7 +174,7 @@ def _mount_react_frontend(app: FastAPI) -> None:
             status_code=503,
             content=(
                 "React frontend is not built yet. Run `npm install && npm run build` in "
-                "the `frontend` folder, or use the Vite dev server on http://localhost:3000."
+                "the `frontend` folder, or use the Vite dev server on http://localhost:5173."
             ),
         )
 
