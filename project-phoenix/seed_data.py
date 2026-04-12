@@ -4,7 +4,10 @@ import asyncio
 from decimal import Decimal
 from uuid import uuid4
 
+import app.models  # noqa: F401
 from app.database import Base, async_session_factory, engine
+
+SEEDED_PASSWORD_HASH = "$argon2id$v=19$m=65536,t=3,p=4$kza5GX6CX1egedFtW11Yxw$qVjmj39ReD8venqcGkbeTbIPv2rWxzhphs5gHQldg60"
 
 
 async def seed():
@@ -23,22 +26,22 @@ async def seed():
         print("Creating users...")
 
         admin = User(
-            id=uuid4(), email="admin@phoenix.id", hashed_password="$2b$12$dummyhashfordevonly000000000000000000000000000",
+            id=uuid4(), email="admin@phoenix.id", hashed_password=SEEDED_PASSWORD_HASH,
             full_name="Admin Phoenix", phone="081200000001", role=UserRole.ADMIN,
             is_active=True, is_superuser=True, is_verified=True,
         )
         warehouse = User(
-            id=uuid4(), email="gudang@phoenix.id", hashed_password="$2b$12$dummyhashfordevonly000000000000000000000000000",
+            id=uuid4(), email="gudang@phoenix.id", hashed_password=SEEDED_PASSWORD_HASH,
             full_name="Staff Gudang", phone="081200000002", role=UserRole.WAREHOUSE,
             is_active=True, is_superuser=False, is_verified=True,
         )
         customer1 = User(
-            id=uuid4(), email="budi@example.com", hashed_password="$2b$12$dummyhashfordevonly000000000000000000000000000",
+            id=uuid4(), email="budi@example.com", hashed_password=SEEDED_PASSWORD_HASH,
             full_name="Budi Santoso", phone="081234567890", role=UserRole.CUSTOMER,
             is_active=True, is_superuser=False, is_verified=True,
         )
         customer2 = User(
-            id=uuid4(), email="siti@example.com", hashed_password="$2b$12$dummyhashfordevonly000000000000000000000000000",
+            id=uuid4(), email="siti@example.com", hashed_password=SEEDED_PASSWORD_HASH,
             full_name="Siti Rahayu", phone="081298765432", role=UserRole.CUSTOMER,
             is_active=True, is_superuser=False, is_verified=True,
         )

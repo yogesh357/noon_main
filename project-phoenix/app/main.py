@@ -2,12 +2,15 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.config import settings
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIST_DIR = BASE_DIR.parent / "frontend" / "dist"
 
 
 @asynccontextmanager
@@ -35,6 +38,13 @@ def create_app() -> FastAPI:
 
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(I18nMiddleware)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     app.add_middleware(
         SessionMiddleware,
         secret_key=settings.secret_key,
@@ -65,83 +75,24 @@ def create_app() -> FastAPI:
     # Mount SQLAdmin
     _mount_admin(app)
 
+    # Serve React SPA after API routes are in place.
+    _mount_react_frontend(app)
+
     return app
 
 
 def _register_routers(app: FastAPI) -> None:
-    # Page routes (server-rendered HTML)
-    from app.routers.pages import home as home_pages
-
-    app.include_router(home_pages.router)
-
-    from app.routers.pages import static_pages
-
-    app.include_router(static_pages.router)
-
-    from app.routers.pages import auth as auth_pages
-
-    app.include_router(auth_pages.router)
-
-    from app.routers.pages import catalog as catalog_pages
-
-    app.include_router(catalog_pages.router)
-
-    from app.routers.pages import cart as cart_pages
-
-    app.include_router(cart_pages.router)
-
-    from app.routers.pages import checkout as checkout_pages
-
-    app.include_router(checkout_pages.router)
-
-    from app.routers.pages import dashboard as dashboard_pages
-
-    app.include_router(dashboard_pages.router)
-
-    from app.routers.pages import admin_panel
-
-    app.include_router(admin_panel.router)
-
-    from app.routers.pages import warehouse as warehouse_pages
-
-    app.include_router(warehouse_pages.router)
-
-    # Language API
-    from app.routers.api import language as language_api
-
-    app.include_router(language_api.router)
-
-    from app.routers.api import wishlist as wishlist_api
-
-    app.include_router(wishlist_api.router)
-
-    from app.routers.api import cart as cart_api
-
-    app.include_router(cart_api.router)
-
-    from app.routers.api import search as search_api
-
-    app.include_router(search_api.router)
-
     from app.routers.api import payments as payments_api
 
     app.include_router(payments_api.router)
 
-    from app.routers.api import dashboard as dashboard_api
-
-    app.include_router(dashboard_api.router)
-
-    from app.routers.api import stock as stock_api
-
-    app.include_router(stock_api.router)
-
-    from app.routers.api import warehouse as warehouse_api
-
-    app.include_router(warehouse_api.router)
-
     from app.routers.api import disputes as disputes_api
 
     app.include_router(disputes_api.router)
+
+    from app.routers.api import react_frontend as react_frontend_api
+
+    app.include_router(react_frontend_api.router)
 
     # Auth API routes (fastapi-users)
     from app.auth import bearer_backend, cookie_backend, fastapi_users
@@ -188,7 +139,43 @@ def _mount_admin(app: FastAPI) -> None:
         if settings.debug:
             import traceback
 
-            traceback.print_exc()
+        traceback.print_exc()
+
+
+def _mount_react_frontend(app: FastAPI) -> None:
+    if FRONTEND_DIST_DIR.exists():
+        assets_dir = FRONTEND_DIST_DIR / "assets"
+        if assets_dir.exists():
+            app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="frontend-assets")
+
+        index_file = FRONTEND_DIST_DIR / "index.html"
+
+        @app.get("/", include_in_schema=False)
+        async def spa_index():
+            return FileResponse(index_file)
+
+        @app.get("/{full_path:path}", include_in_schema=False)
+        async def spa_fallback(full_path: str):
+            if full_path.startswith(("api/", "static/", "assets/", "admin/")):
+                return HTMLResponse(status_code=404, content="Not Found")
+            if full_path == "placeholder.svg":
+                return FileResponse(BASE_DIR / "static" / "images" / "placeholder.svg")
+            requested_file = FRONTEND_DIST_DIR / full_path
+            if requested_file.is_file():
+                return FileResponse(requested_file)
+            return FileResponse(index_file)
+
+        return
+
+    @app.get("/", include_in_schema=False)
+    async def frontend_not_built():
+        return HTMLResponse(
+            status_code=503,
+            content=(
+                "React frontend is not built yet. Run `npm install && npm run build` in "
+                "the `frontend` folder, or use the Vite dev server on http://localhost:3000."
+            ),
+        )
 
 
 app = create_app()

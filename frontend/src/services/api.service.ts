@@ -15,6 +15,26 @@ const apiClient = axios.create({
   withCredentials: true, // send cookies (session auth)
 })
 
+const normalizeUser = (user: Record<string, unknown>): User => ({
+  id: String(user.id ?? ''),
+  email: String(user.email ?? ''),
+  full_name: String(user.full_name ?? ''),
+  phone: typeof user.phone === 'string' ? user.phone : undefined,
+  avatar_url: typeof user.avatar_url === 'string' ? user.avatar_url : undefined,
+  language: (user.language ?? user.language_pref ?? 'id') as User['language'],
+  role: String(user.role ?? 'customer').toUpperCase() as User['role'],
+  is_verified: Boolean(user.is_verified),
+  is_active: Boolean(user.is_active),
+  created_at: String(user.created_at ?? ''),
+})
+
+const authFormPayload = (payload: LoginPayload) => {
+  const form = new URLSearchParams()
+  form.set('username', payload.username)
+  form.set('password', payload.password)
+  return form
+}
+
 // Attach JWT bearer token from localStorage if present
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = localStorage.getItem('access_token')
@@ -44,15 +64,19 @@ apiClient.interceptors.response.use(
 export const authService = {
   /** Cookie-based login (for web sessions) */
   login: (payload: LoginPayload) =>
-    apiClient.post<{ access_token: string }>('/auth/login', payload),
+    apiClient.post<{ access_token: string }>('/auth/login', authFormPayload(payload), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    }),
 
   /** JWT bearer login */
   bearerLogin: (payload: LoginPayload) =>
-    apiClient.post<{ access_token: string; token_type: string }>('/auth/bearer/login', payload),
+    apiClient.post<{ access_token: string; token_type: string }>('/auth/bearer/login', authFormPayload(payload), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    }),
 
   /** Register new account */
   register: (payload: RegisterPayload) =>
-    apiClient.post<User>('/auth/register', payload),
+    apiClient.post('/auth/register', payload).then(({ data }) => ({ data: normalizeUser(data as Record<string, unknown>) })),
 
   /** Logout (clears cookie) */
   logout: () =>
@@ -76,11 +100,11 @@ export const authService = {
 
   /** Get current user */
   getMe: () =>
-    apiClient.get<User>('/users/me'),
+    apiClient.get('/users/me').then(({ data }) => ({ data: normalizeUser(data as Record<string, unknown>) })),
 
   /** Update profile */
   updateMe: (data: Partial<Pick<User, 'full_name' | 'phone' | 'language'>>) =>
-    apiClient.patch<User>('/users/me', data),
+    apiClient.patch('/users/me', data).then(({ data: user }) => ({ data: normalizeUser(user as Record<string, unknown>) })),
 }
 
 // ─── Catalog ──────────────────────────────────────────────────────────────────
