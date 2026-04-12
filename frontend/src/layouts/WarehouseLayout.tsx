@@ -2,12 +2,21 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { useAppSelector } from '../app/hooks'
 import Toast from '../components/common/Toast'
+import {
+  Home,
+
+  ListChecks,
+  Package,
+  Handshake,
+  Box,
+  Truck
+} from 'lucide-react'
 
 const navItems = [
-  { to: '/warehouse', label: 'Home', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', end: true },
-  { to: '/warehouse/picking', label: 'Picking', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01' },
-  { to: '/warehouse/packing', label: 'Packing', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
-  { to: '/warehouse/handover', label: 'Handover', icon: 'M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20' },
+  { to: '/warehouse', label: 'Dashboard', icon: Home, end: true },
+  { to: '/warehouse/picking', label: 'Picking', icon: ListChecks },
+  { to: '/warehouse/packing', label: 'Packing', icon: Package },
+  { to: '/warehouse/handover', label: 'Handover', icon: Handshake },
 ]
 
 export default function WarehouseLayout() {
@@ -20,80 +29,104 @@ export default function WarehouseLayout() {
   }, [user])
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white flex flex-col">
+    <div className="min-h-screen bg-neutral-950 text-white flex flex-col font-sans selection:bg-primary-500/30">
       {/* Warehouse Header */}
-      <header className="bg-neutral-900 border-b border-neutral-800 px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded bg-brand-red flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
+
+      <header className="bg-neutral-900/50 backdrop-blur-md border-b border-white/5 px-6 py-4 sticky top-0 z-50">
+        <div className="flex items-center justify-between max-w-[1440px] mx-auto w-full">
+          <div className="flex items-center gap-4 group cursor-default">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 flex items-center justify-center shadow-lg shadow-rose-900/20 transition-transform group-hover:rotate-12 duration-300">
+              <Box className="text-white" size={20} />
             </div>
             <div>
-              <p className="text-sm font-semibold text-white">Warehouse Operations</p>
-              <p className="text-[10px] text-neutral-400">Project Phoenix WMS</p>
+              <p className="text-xs font-black text-white uppercase tracking-widest">Warehouse Ops</p>
+              <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-tighter">Project Phoenix WMS</p>
             </div>
           </div>
           {user && (
-            <div className="text-right">
-              <p className="text-xs font-medium text-neutral-300">{user.full_name}</p>
-              <p className="text-[10px] text-neutral-500">Warehouse Staff</p>
+            <div className="flex items-center gap-4 bg-white/5 p-1.5 pr-4 rounded-xl border border-white/10 group">
+              <div className="w-8 h-8 rounded-lg bg-neutral-800 flex items-center justify-center text-xs font-black text-rose-500 group-hover:bg-rose-500 group-hover:text-white transition-all duration-300">
+                {user.full_name?.charAt(0).toUpperCase()}
+              </div>
+              <div className="text-right hidden sm:block">
+                <p className="text-xs font-black text-white">{user.full_name}</p>
+                <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-[0.05em]">Logistics Staff</p>
+              </div>
             </div>
           )}
         </div>
       </header>
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 w-full">
         {/* Sidebar */}
-        <aside className="hidden lg:flex w-48 flex-shrink-0 flex-col bg-neutral-900 border-r border-neutral-800">
-          <nav className="p-3 space-y-0.5">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.end}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-brand-red text-white'
-                      : 'text-neutral-400 hover:bg-neutral-800 hover:text-white'
-                  }`
-                }
-              >
-                <svg className="w-4.5 h-4.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={item.icon} />
-                </svg>
-                {item.label}
-              </NavLink>
-            ))}
+        <aside className="hidden lg:flex w-64 flex-shrink-0 flex-col bg-neutral-950 border-r border-white/5 p-6">
+          <nav className="space-y-1.5 flex-1">
+            <h3 className="text-[10px] font-black text-neutral-600 uppercase tracking-[0.2em] mb-4 ml-2">Main Controls</h3>
+            {navItems.map((item) => {
+              const Icon = item.icon
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.end}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 group ${isActive
+                      ? 'bg-rose-600 text-white shadow-lg shadow-rose-900/20 translate-x-1'
+                      : 'text-neutral-500 hover:bg-white/5 hover:text-white'
+                    }`
+                  }
+                >
+                  <Icon size={18} className="transition-transform group-hover:scale-110" />
+                  <span>{item.label}</span>
+                </NavLink>
+              )
+            })}
           </nav>
+
+          <div className="mt-auto">
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-2 mb-2">
+                <Truck size={14} className="text-rose-500" />
+                <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Quick Report</span>
+              </div>
+              <p className="text-[11px] text-neutral-500 leading-relaxed">
+                Report any equipment issues or inventory discrepancies immediately.
+              </p>
+            </div>
+          </div>
         </aside>
 
         {/* Content */}
-        <main className="flex-1 p-4 sm:p-6 pb-20 lg:pb-6">
+        <main className="flex-1 p-6 lg:p-8 pb-24 lg:pb-8 bg-neutral-950/40 backdrop-blur-sm">
           <Outlet />
         </main>
       </div>
 
       {/* Mobile Bottom Nav */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-neutral-900 border-t border-neutral-800 flex z-40">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.end}
-            className={({ isActive }) =>
-              `flex-1 flex flex-col items-center py-2.5 text-[10px] gap-1 ${isActive ? 'text-brand-red' : 'text-neutral-500'}`
-            }
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={item.icon} />
-            </svg>
-            {item.label}
-          </NavLink>
-        ))}
-      </nav>
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-neutral-900/90 backdrop-blur-xl border-t border-white/5 flex z-40 px-2 py-1.5 shadow-[0_-8px_30px_rgb(0,0,0,0.5)]">
+        {navItems.map((item) => {
+          const Icon = item.icon
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) =>
+                `flex-1 flex flex-col items-center py-2 text-[10px] gap-1 transition-all duration-300 ${isActive
+                  ? 'text-rose-500 font-black scale-110'
+                  : 'text-neutral-500 font-bold'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                  <span className="uppercase tracking-[0.05em]">{item.label}</span>
+                </>
+              )}
+            </NavLink>
+          )
+        })}</nav>
       <Toast />
     </div>
   )

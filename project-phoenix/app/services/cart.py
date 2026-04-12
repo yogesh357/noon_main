@@ -1,11 +1,17 @@
 from decimal import Decimal
 
-from sqlalchemy import select
+from sqlalchemy import inspect, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.models.cart import Cart, CartItem
 from app.models.catalog import Product, ProductVariant
+
+
+async def _ensure_items_loaded(db: AsyncSession, cart: Cart) -> None:
+    """Ensure cart items are loaded into the object to prevent lazy-load errors."""
+    if "items" in inspect(cart).unloaded:
+        await db.refresh(cart, ["items"])
 
 
 async def get_or_create_cart(
@@ -99,6 +105,7 @@ async def add_to_cart(
         return None
 
     # Check if already in cart
+    await _ensure_items_loaded(db, cart)
     for item in cart.items:
         if item.variant_id == variant_id:
             new_qty = item.quantity + quantity
@@ -123,6 +130,7 @@ async def update_cart_item(
     quantity: int,
 ) -> bool:
     """Update cart item quantity. Quantity 0 removes the item."""
+    await _ensure_items_loaded(db, cart)
     for item in cart.items:
         if item.id == item_id:
             if quantity <= 0:
@@ -149,6 +157,7 @@ async def get_cart_details(db: AsyncSession, cart: Cart) -> dict:
     items_detail = []
     subtotal = Decimal("0")
 
+    await _ensure_items_loaded(db, cart)
     for item in cart.items:
         variant_stmt = (
             select(ProductVariant)
@@ -195,5 +204,11 @@ async def get_cart_details(db: AsyncSession, cart: Cart) -> dict:
 
 
 def get_cart_item_count(cart: Cart) -> int:
-    """Quick count of items in cart."""
-    return sum(item.quantity for item in cart.items) if cart.items else 0
+    """Quick count of items in cart. Defensive against unloaded items."""
+    try:
+        # Check if items attribute is initialized and not uninitialized
+        if "items" in inspect(cart).unloaded:
+            return 0
+        return sum(item.quantity for item in cart.items)
+    except Exception:
+        return 0

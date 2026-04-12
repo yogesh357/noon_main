@@ -4,8 +4,21 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { logout } from '../../features/auth/authSlice'
 import { toggleLanguage, setSearchOpen } from '../../features/ui/uiSlice'
 import { t } from '../../utils/i18n'
+import { 
+  Search, 
+  Languages, 
+  User, 
+  ShoppingBag, 
+  Menu, 
+  X, 
+  LogOut, 
+  LayoutDashboard, 
+  Bell,
+  ShoppingCart,
+  ChevronDown
+} from 'lucide-react'
 
-export default function Navbar() {
+export default function Navbar({ fluid = false }: { fluid?: boolean }) {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { user } = useAppSelector((s) => s.auth)
@@ -46,36 +59,41 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-neutral-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-neutral-100 shadow-sm">
+      <div className={fluid ? "px-4 sm:px-6 lg:px-10" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"}>
         <div className="flex items-center justify-between h-16 lg:h-20">
 
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0">
-            <span className="text-xl font-bold tracking-tight text-neutral-900">PHOENIX</span>
+          <Link to="/" className="flex-shrink-0 group flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-neutral-900 flex items-center justify-center transition-transform group-hover:rotate-12">
+              <span className="text-white text-lg font-black italic">P</span>
+            </div>
+            <span className="text-xl font-black tracking-tighter text-neutral-900 uppercase">PHOENIX</span>
           </Link>
 
           {/* Desktop Nav */}
           {!searchVisible && (
-            <nav className="hidden lg:flex items-center space-x-8">
-              <Link to="/products" className="text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors">
-                {t('Products', language)}
-              </Link>
-              <Link to="/about" className="text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors">
-                {t('About Us', language)}
-              </Link>
-              <Link to="/faq" className="text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors">
-                {t('FAQ', language)}
-              </Link>
-              <Link to="/contact" className="text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors">
-                {t('Contact', language)}
-              </Link>
+            <nav className="hidden lg:flex items-center space-x-1">
+              {[
+                { label: 'Products', to: '/products' },
+                { label: 'About Us', to: '/about' },
+                { label: 'FAQ', to: '/faq' },
+                { label: 'Contact', to: '/contact' }
+              ].map((item) => (
+                <Link 
+                  key={item.to}
+                  to={item.to} 
+                  className="px-4 py-2 text-sm font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 rounded-xl transition-all"
+                >
+                  {t(item.label, language)}
+                </Link>
+              ))}
             </nav>
           )}
 
           {/* Search input (expanded) */}
           {searchVisible && (
-            <form onSubmit={handleSearch} className="flex-1 mx-8 hidden lg:block">
+            <form onSubmit={handleSearch} className="flex-1 mx-8 hidden lg:block transition-all animate-in fade-in slide-in-from-top-2">
               <div className="relative">
                 <input
                   ref={searchRef}
@@ -83,17 +101,16 @@ export default function Navbar() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={t('Search products...', language)}
-                  className="w-full px-4 py-2.5 pl-10 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red"
+                  className="w-full px-5 py-3 pl-12 bg-neutral-100 border-none rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-white transition-all shadow-inner"
                   autoFocus
                 />
-                <svg className="absolute left-3 top-3 w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <button type="button" onClick={() => setSearchVisible(false)}
-                  className="absolute right-3 top-2.5 text-neutral-400 hover:text-neutral-700">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <button 
+                  type="button" 
+                  onClick={() => setSearchVisible(false)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-900 transition-colors p-1"
+                >
+                  <X size={16} />
                 </button>
               </div>
             </form>
@@ -102,65 +119,79 @@ export default function Navbar() {
           {/* Right Controls */}
           <div className="flex items-center space-x-1 sm:space-x-2">
             {/* Search toggle */}
-            <button onClick={() => { setSearchVisible(!searchVisible); setMobileOpen(false) }}
-              className="p-2 text-neutral-600 hover:text-neutral-900 transition-colors rounded-lg hover:bg-neutral-100"
-              aria-label="Search">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </button>
+            {!searchVisible && (
+              <button 
+                onClick={() => { setSearchVisible(true); setMobileOpen(false) }}
+                className="p-2.5 text-neutral-500 hover:text-neutral-900 rounded-xl hover:bg-neutral-50 transition-all active:scale-95"
+                aria-label="Search"
+              >
+                <Search size={20} />
+              </button>
+            )}
 
             {/* Language toggle */}
             <button
               onClick={() => dispatch(toggleLanguage())}
-              className="hidden sm:inline-flex items-center px-2.5 py-1.5 text-xs font-medium text-neutral-600 border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors"
+              className="hidden sm:inline-flex items-center px-3 py-1.5 text-xs font-black text-neutral-500 border border-neutral-200 rounded-xl hover:bg-neutral-50 hover:border-neutral-300 transition-all uppercase tracking-widest active:scale-95"
             >
-              {language === 'id' ? 'EN' : 'ID'}
+              <Languages size={14} className="mr-2 opacity-50" />
+              {language === 'id' ? 'ID' : 'EN'}
             </button>
 
             {/* Account / Profile */}
             {user ? (
               <div className="relative" onClick={(e) => e.stopPropagation()}>
-                <button onClick={() => setProfileOpen(!profileOpen)}
-                  className="flex items-center gap-2 p-2 text-neutral-600 hover:text-neutral-900 rounded-lg hover:bg-neutral-100 transition-colors">
+                <button 
+                  onClick={() => setProfileOpen(!profileOpen)}
+                  className="flex items-center gap-2 p-1.5 pr-2.5 bg-neutral-100 hover:bg-neutral-200 rounded-2xl transition-all group active:scale-95"
+                >
                   {user.avatar_url ? (
-                    <img src={user.avatar_url} alt={user.full_name} className="w-7 h-7 rounded-full object-cover" />
+                    <img src={user.avatar_url} alt={user.full_name} className="w-8 h-8 rounded-xl object-cover shadow-sm" />
                   ) : (
-                    <div className="w-7 h-7 rounded-full bg-brand-red text-white flex items-center justify-center text-xs font-semibold">
+                    <div className="w-8 h-8 rounded-xl bg-primary-600 text-white flex items-center justify-center text-xs font-black shadow-lg shadow-primary-200">
                       {user.full_name.charAt(0).toUpperCase()}
                     </div>
                   )}
+                  <ChevronDown size={14} className={`text-neutral-400 transition-transform duration-300 ${profileOpen ? 'rotate-180' : ''}`} />
                   {notificationCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-brand-red text-white text-[10px] rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 text-white text-[10px] rounded-full flex items-center justify-center font-black border-2 border-white animate-bounce">
                       {notificationCount > 9 ? '9+' : notificationCount}
                     </span>
                   )}
                 </button>
                 {profileOpen && (
-                  <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-neutral-200 py-1 z-50">
-                    <div className="px-4 py-2.5 border-b border-neutral-100">
-                      <p className="text-sm font-medium text-neutral-900 truncate">{user.full_name}</p>
-                      <p className="text-xs text-neutral-500 truncate">{user.email}</p>
+                  <div className="absolute right-0 mt-3 w-64 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-neutral-100 p-2 z-50 animate-in fade-in zoom-in-95 font-sans">
+                    <div className="px-4 py-3 mb-1 bg-neutral-50/50 rounded-xl border border-neutral-100">
+                      <p className="text-sm font-black text-neutral-900 truncate">{user.full_name}</p>
+                      <p className="text-[10px] text-neutral-500 truncate font-bold uppercase tracking-widest">{user.email}</p>
                     </div>
-                    <Link to={getDashboardLink()} className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" /></svg>
-                      {t('My Dashboard', language)}
-                    </Link>
-                    <Link to="/dashboard/orders" className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" /></svg>
-                      {t('Orders', language)}
-                    </Link>
-                    <Link to="/dashboard/notifications" className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                      {t('Notifications', language)}
-                      {notificationCount > 0 && (
-                        <span className="ml-auto bg-brand-red text-white text-xs px-1.5 py-0.5 rounded-full">{notificationCount}</span>
-                      )}
-                    </Link>
-                    <div className="border-t border-neutral-100 mt-1">
-                      <button onClick={handleLogout}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                    
+                    <div className="grid grid-cols-1 gap-0.5">
+                      <Link to={getDashboardLink()} className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-neutral-600 hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-colors group">
+                        <LayoutDashboard size={18} className="opacity-50 group-hover:opacity-100 transition-opacity" />
+                        {t('My Dashboard', language)}
+                      </Link>
+                      <Link to="/dashboard/orders" className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-neutral-600 hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-colors group">
+                        <ShoppingCart size={18} className="opacity-50 group-hover:opacity-100 transition-opacity" />
+                        {t('Orders', language)}
+                      </Link>
+                      <Link to="/dashboard/notifications" className="flex items-center justify-between px-3 py-2.5 text-sm font-bold text-neutral-600 hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-colors group">
+                        <div className="flex items-center gap-3">
+                          <Bell size={18} className="opacity-50 group-hover:opacity-100 transition-opacity" />
+                          {t('Notifications', language)}
+                        </div>
+                        {notificationCount > 0 && (
+                          <span className="bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">{notificationCount}</span>
+                        )}
+                      </Link>
+                    </div>
+
+                    <div className="mt-2 pt-2 border-t border-neutral-50">
+                      <button 
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-black text-rose-500 hover:bg-rose-50 rounded-xl transition-colors group"
+                      >
+                        <LogOut size={18} className="group-hover:translate-x-1 transition-transform" />
                         {t('Logout', language)}
                       </button>
                     </div>
@@ -168,80 +199,69 @@ export default function Navbar() {
                 )}
               </div>
             ) : (
-              <Link to="/auth/login" className="p-2 text-neutral-600 hover:text-neutral-900 transition-colors rounded-lg hover:bg-neutral-100">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+              <Link 
+                to="/auth/login" 
+                className="p-2.5 text-neutral-500 hover:text-neutral-900 rounded-xl hover:bg-neutral-50 transition-all active:scale-95"
+              >
+                <User size={20} />
               </Link>
             )}
 
             {/* Cart */}
-            <Link to="/cart" className="relative p-2 text-neutral-600 hover:text-neutral-900 transition-colors rounded-lg hover:bg-neutral-100" aria-label="Cart">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-              </svg>
+            <Link 
+              to="/cart" 
+              className="relative p-2.5 text-neutral-500 hover:text-neutral-900 rounded-xl hover:bg-neutral-50 transition-all group active:scale-95" 
+              aria-label="Cart"
+            >
+              <ShoppingBag size={20} className="group-hover:rotate-6 transition-transform" />
               {cartCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-brand-red text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-medium">
+                <span className="absolute top-1 right-1 bg-primary-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-black border-2 border-white shadow-sm">
                   {cartCount > 9 ? '9+' : cartCount}
                 </span>
               )}
             </Link>
 
-            {/* Mobile menu */}
-            <button onClick={() => setMobileOpen(!mobileOpen)}
-              className="lg:hidden p-2 text-neutral-600 rounded-lg hover:bg-neutral-100">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {mobileOpen
-                  ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-                  : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
-                }
-              </svg>
+            {/* Mobile menu toggle */}
+            <button 
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="lg:hidden p-2.5 text-neutral-500 hover:text-neutral-900 rounded-xl hover:bg-neutral-50 transition-all active:scale-95"
+            >
+              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile search */}
-      {searchVisible && (
-        <div className="lg:hidden px-4 pb-3">
-          <form onSubmit={handleSearch}>
-            <div className="relative">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t('Search products...', language)}
-                className="w-full px-4 py-2.5 pl-10 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red"
-                autoFocus
-              />
-              <svg className="absolute left-3 top-3 w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </form>
-        </div>
-      )}
-
       {/* Mobile Nav */}
       {mobileOpen && (
-        <div className="lg:hidden border-t border-neutral-200 bg-white">
-          <nav className="max-w-7xl mx-auto px-4 py-4 space-y-1">
-            <Link to="/products" onClick={() => setMobileOpen(false)} className="block py-2.5 px-3 rounded-lg text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 text-sm font-medium">
-              {t('Products', language)}
-            </Link>
-            <Link to="/about" onClick={() => setMobileOpen(false)} className="block py-2.5 px-3 rounded-lg text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 text-sm font-medium">
-              {t('About Us', language)}
-            </Link>
-            <Link to="/faq" onClick={() => setMobileOpen(false)} className="block py-2.5 px-3 rounded-lg text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 text-sm font-medium">
-              {t('FAQ', language)}
-            </Link>
-            <Link to="/contact" onClick={() => setMobileOpen(false)} className="block py-2.5 px-3 rounded-lg text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 text-sm font-medium">
-              {t('Contact', language)}
-            </Link>
-            <div className="pt-2 border-t border-neutral-100">
-              <button onClick={() => { dispatch(toggleLanguage()); setMobileOpen(false) }}
-                className="block py-2.5 px-3 text-sm text-neutral-600">
-                {language === 'id' ? '🌐 English' : '🌐 Indonesia'}
+        <div className="lg:hidden border-t border-neutral-100 bg-white/95 backdrop-blur-xl animate-in fade-in slide-in-from-top-4">
+          <nav className="px-4 py-6 space-y-1">
+            {[
+              { label: 'Products', to: '/products' },
+              { label: 'About Us', to: '/about' },
+              { label: 'FAQ', to: '/faq' },
+              { label: 'Contact', to: '/contact' }
+            ].map((item) => (
+              <Link 
+                key={item.to}
+                to={item.to} 
+                onClick={() => setMobileOpen(false)} 
+                className="block py-3 px-4 rounded-2xl text-base font-black text-neutral-600 hover:bg-primary-50 hover:text-primary-700 transition-all"
+              >
+                {t(item.label, language)}
+              </Link>
+            ))}
+            
+            <div className="pt-4 mt-4 border-t border-neutral-50">
+              <button 
+                onClick={() => { dispatch(toggleLanguage()); setMobileOpen(false) }}
+                className="w-full flex items-center justify-between py-3 px-4 bg-neutral-50 rounded-2xl text-sm font-black text-neutral-600"
+              >
+                <div className="flex items-center gap-2">
+                  <Languages size={18} className="opacity-50" />
+                  {language === 'id' ? 'Swicth to English' : 'Ganti ke Indonesia'}
+                </div>
+                <span className="text-primary-600 uppercase tracking-widest">{language === 'id' ? 'EN' : 'ID'}</span>
               </button>
             </div>
           </nav>
