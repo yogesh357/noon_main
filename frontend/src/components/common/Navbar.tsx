@@ -18,7 +18,7 @@ import {
   ChevronDown
 } from 'lucide-react'
 
-export default function Navbar() {
+export default function Navbar({ fluid = false }: { fluid?: boolean }) {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { user } = useAppSelector((s) => s.auth)
@@ -60,7 +60,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-neutral-100 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className={fluid ? "px-4 sm:px-6 lg:px-10" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"}>
         <div className="flex items-center justify-between h-16 lg:h-20">
 
           {/* Logo */}

@@ -30,8 +30,8 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen flex flex-col bg-neutral-50/50">
-      <Navbar />
-      <div className="flex-1 flex max-w-[1440px] mx-auto w-full">
+      <Navbar fluid />
+      <div className="flex-1 flex w-full">
         {/* Sidebar */}
         <aside className="hidden lg:flex w-64 flex-shrink-0 flex-col border-r border-neutral-100 bg-white/50 backdrop-blur-xl sticky top-20 h-[calc(100vh-5rem)]">
           <div className="p-6 flex flex-col h-full">

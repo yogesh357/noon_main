@@ -57,7 +57,7 @@ export default function WarehouseLayout() {
         </div>
       </header>
 
-      <div className="flex flex-1 max-w-[1440px] mx-auto w-full">
+      <div className="flex flex-1 w-full">
         {/* Sidebar */}
         <aside className="hidden lg:flex w-64 flex-shrink-0 flex-col bg-neutral-950 border-r border-white/5 p-6">
           <nav className="space-y-1.5 flex-1">
