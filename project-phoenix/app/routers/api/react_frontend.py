@@ -13,7 +13,7 @@ from sqlalchemy.orm import selectinload
 
 from app.auth import current_active_user, optional_current_user
 from app.dependencies import get_db
-from app.models.catalog import Product, ProductVariant, Review
+from app.models.catalog import Category, Product, ProductCategory, ProductImage, ProductVariant, Review
 from app.models.dispute import Dispute, DisputeStatus, DisputeType
 from app.models.logistics import Shipment, TrackingEvent
 from app.models.marketplace import MarketplaceOrder
@@ -1193,3 +1193,222 @@ async def api_warehouse_handover_complete(batch_id: int, db: AsyncSession = Depe
         options=[selectinload(HandoverBatch.items).selectinload(HandoverItem.order)],
     )
     return _serialize_handover_batch(batch)
+
+
+# ─── Admin: Product Management ───────────────────────────────────────────────
+
+def _slugify(text: str) -> str:
+    """Convert text to URL-safe slug."""
+    import re
+    text = text.lower().strip()
+    text = re.sub(r"[^\w\s-]", "", text)
+    text = re.sub(r"[\s_-]+", "-", text)
+    text = re.sub(r"^-+|-+$", "", text)
+    return text
+
+
+@router.get("/api/admin-panel/products")
+async def api_admin_list_products(
+    page: int = Query(1, ge=1),
+    per_page: int = Query(20, ge=1, le=100),
+    search: str | None = None,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(current_active_user),
+):
+    _require_role(user, UserRole.ADMIN)
+    stmt = (
+        select(Product)
+        .options(selectinload(Product.images), selectinload(Product.variants), selectinload(Product.categories))
+        .order_by(Product.created_at.desc())
+    )
+    if search:
+        stmt = stmt.where(
+            Product.name_id.ilike(f"%{search}%") | Product.name_en.ilike(f"%{search}%")
+        )
+    count_stmt = select(func.count()).select_from(stmt.subquery())
+    total = (await db.execute(count_stmt)).scalar_one()
+    stmt = stmt.offset((page - 1) * per_page).limit(per_page)
+    products = list((await db.execute(stmt)).scalars().unique().all())
+    return {
+        "items": [_serialize_product(p) for p in products],
+        "total": total,
+        "page": page,
+        "per_page": per_page,
+        "pages": max(1, ceil(total / per_page)),
+    }
+
+
+@router.post("/api/admin-panel/products", status_code=status.HTTP_201_CREATED)
+async def api_admin_create_product(
+    body: dict,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(current_active_user),
+):
+    """Admin: create a product with variants and images."""
+    _require_role(user, UserRole.ADMIN)
+
+    # Validate required fields
+    name_id = (body.get("name_id") or "").strip()
+    name_en = (body.get("name_en") or "").strip()
+    base_price = body.get("base_price")
+    if not name_id or not name_en:
+        raise HTTPException(status_code=400, detail="name_id and name_en are required")
+    try:
+        base_price = float(base_price)
+        if base_price < 0:
+            raise ValueError
+    except (TypeError, ValueError):
+        raise HTTPException(status_code=400, detail="base_price must be a positive number")
+
+    # Pre-validate all variants before touching the DB
+    variants_data = body.get("variants") or []
+    if not variants_data:
+        raise HTTPException(status_code=400, detail="At least one variant with a SKU is required")
+
+    seen_skus: set[str] = set()
+    seen_barcodes: set[str] = set()
+    for v in variants_data:
+        sku = (v.get("sku") or "").strip()
+        if not sku:
+            raise HTTPException(status_code=400, detail="Each variant must have a SKU")
+        if sku in seen_skus:
+            raise HTTPException(status_code=400, detail=f"Duplicate SKU '{sku}' in the same request")
+        seen_skus.add(sku)
+        if (await db.execute(select(ProductVariant).where(ProductVariant.sku == sku))).scalar_one_or_none():
+            raise HTTPException(status_code=409, detail=f"SKU '{sku}' sudah digunakan / already exists")
+
+        barcode = (v.get("barcode") or "").strip() or None
+        if barcode:
+            if barcode in seen_barcodes:
+                raise HTTPException(status_code=400, detail=f"Duplicate barcode '{barcode}' in the same request")
+            seen_barcodes.add(barcode)
+            if (await db.execute(select(ProductVariant).where(ProductVariant.barcode == barcode))).scalar_one_or_none():
+                raise HTTPException(status_code=409, detail=f"Barcode '{barcode}' sudah digunakan oleh produk lain / already used by another variant")
+
+    # Auto-generate slug from English name; ensure uniqueness
+    base_slug = _slugify(name_en)
+    slug = base_slug
+    counter = 1
+    while (await db.execute(select(Product).where(Product.slug == slug))).scalar_one_or_none():
+        slug = f"{base_slug}-{counter}"
+        counter += 1
+
+    product = Product(
+        name_id=name_id,
+        name_en=name_en,
+        slug=slug,
+        description_id=body.get("description_id") or None,
+        description_en=body.get("description_en") or None,
+        brand=body.get("brand") or None,
+        base_price=base_price,
+        is_active=bool(body.get("is_active", True)),
+    )
+    db.add(product)
+    await db.flush()  # get product.id
+
+    # Attach categories
+    for cat_id in (body.get("category_ids") or []):
+        cat = await db.get(Category, int(cat_id))
+        if cat:
+            db.add(ProductCategory(product_id=product.id, category_id=cat.id))
+
+    # Create variants (already validated above)
+    for v in variants_data:
+        sku = (v.get("sku") or "").strip()
+        barcode = (v.get("barcode") or "").strip() or None
+        variant = ProductVariant(
+            product_id=product.id,
+            sku=sku,
+            barcode=barcode,
+            color=v.get("color") or None,
+            size=v.get("size") or None,
+            variant_type=v.get("variant_type") or None,
+            price_override=float(v["price_override"]) if v.get("price_override") is not None else None,
+            stock_quantity=int(v.get("stock_quantity") or 0),
+            weight_grams=int(v["weight_grams"]) if v.get("weight_grams") else None,
+            is_active=True,
+        )
+        db.add(variant)
+
+    # Create images
+    for idx, img in enumerate(body.get("images") or []):
+        image_url = (img.get("image_url") or "").strip()
+        if not image_url:
+            continue
+        db.add(ProductImage(
+            product_id=product.id,
+            image_url=image_url,
+            alt_text=img.get("alt_text") or name_en,
+            sort_order=idx,
+            is_primary=idx == 0,
+        ))
+
+    await db.commit()
+
+    # Reload with eager-loaded relationships via select (db.get uses identity map and skips selectinload)
+    product_id = product.id
+    result = await db.execute(
+        select(Product)
+        .where(Product.id == product_id)
+        .options(
+            selectinload(Product.images),
+            selectinload(Product.variants),
+            selectinload(Product.categories),
+        )
+    )
+    return _serialize_product(result.scalar_one())
+
+
+@router.patch("/api/admin-panel/products/{product_id}")
+async def api_admin_update_product(
+    product_id: int,
+    body: dict,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(current_active_user),
+):
+    _require_role(user, UserRole.ADMIN)
+    product = await db.get(Product, product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    if "name_id" in body and body["name_id"]:
+        product.name_id = body["name_id"]
+    if "name_en" in body and body["name_en"]:
+        product.name_en = body["name_en"]
+    if "description_id" in body:
+        product.description_id = body["description_id"] or None
+    if "description_en" in body:
+        product.description_en = body["description_en"] or None
+    if "brand" in body:
+        product.brand = body["brand"] or None
+    if "base_price" in body:
+        product.base_price = float(body["base_price"])
+    if "is_active" in body:
+        product.is_active = bool(body["is_active"])
+
+    await db.commit()
+    result = await db.execute(
+        select(Product)
+        .where(Product.id == product_id)
+        .options(
+            selectinload(Product.images),
+            selectinload(Product.variants),
+            selectinload(Product.categories),
+        )
+    )
+    return _serialize_product(result.scalar_one())
+
+
+@router.delete("/api/admin-panel/products/{product_id}", status_code=status.HTTP_200_OK)
+async def api_admin_delete_product(
+    product_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(current_active_user),
+):
+    _require_role(user, UserRole.ADMIN)
+    product = await db.get(Product, product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    await db.delete(product)
+    await db.commit()
+    return {"success": True, "id": product_id}

@@ -3,18 +3,20 @@ import { useEffect } from 'react'
 import { useAppSelector } from '../app/hooks'
 import Navbar from '../components/common/Navbar'
 import Toast from '../components/common/Toast'
-import { 
-  LayoutDashboard, 
-  ShoppingCart, 
-  Repeat, 
-  AlertTriangle, 
+import {
+  LayoutDashboard,
+  ShoppingCart,
+  Repeat,
+  AlertTriangle,
   ShieldCheck,
-  PackageSearch
+  PackageSearch,
+  Package
 } from 'lucide-react'
 
 const navItems = [
   { to: '/admin-panel', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/admin-panel/orders', label: 'Orders', icon: ShoppingCart },
+  { to: '/admin-panel/products', label: 'Products', icon: Package },
   { to: '/admin-panel/marketplace-orders', label: 'Marketplace', icon: PackageSearch },
   { to: '/admin-panel/disputes', label: 'Disputes', icon: AlertTriangle },
 ]

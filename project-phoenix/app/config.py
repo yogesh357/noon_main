@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     )
 
     # Application
-    app_name: str = "Project Phoenix"
+    app_name: str = "Noon"
     app_env: str = "development"
     secret_key: str = "change-me-to-a-random-secret-key"
     debug: bool = True
@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     r2_account_id: str = ""
     r2_access_key_id: str = ""
     r2_secret_access_key: str = ""
-    r2_bucket_name: str = "phoenix-assets"
+    r2_bucket_name: str = "noon-assets"
     r2_public_url: str = ""
 
     # Email

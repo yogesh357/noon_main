@@ -49,7 +49,7 @@ def get_jwt_strategy() -> JWTStrategy:
 
 # Cookie transport (for server-rendered pages)
 cookie_transport = CookieTransport(
-    cookie_name="phoenix_auth",
+    cookie_name="noon_auth",
     cookie_max_age=settings.jwt_lifetime_seconds,
     cookie_secure=settings.is_production,
     cookie_httponly=True,

@@ -12,7 +12,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
-            <span className="text-lg font-bold text-white tracking-tight">PHOENIX</span>
+            <span className="text-lg font-bold text-white tracking-tight">NOON</span>
             <p className="mt-3 text-sm leading-relaxed">
               {language === 'id'
                 ? 'Toko online terpercaya untuk produk berkualitas.'
@@ -53,7 +53,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 pt-8 border-t border-neutral-800 text-sm text-center">
-          &copy; {year} Project Phoenix. All rights reserved.
+          &copy; {year} Noon. All rights reserved.
         </div>
       </div>
     </footer>
