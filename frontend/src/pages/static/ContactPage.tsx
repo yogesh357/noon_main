@@ -21,7 +21,7 @@ export default function ContactPage() {
       <div className="grid md:grid-cols-2 gap-10">
         <div className="space-y-6">
           {[
-            { icon: '📧', label: 'Email', val: 'support@projectphoenix.id' },
+            { icon: '📧', label: 'Email', val: 'support@noon.id' },
             { icon: '📱', label: 'WhatsApp', val: '+62 812 3456 7890' },
             { icon: '⏰', label: language === 'id' ? 'Jam Operasional' : 'Business Hours', val: language === 'id' ? 'Senin–Jumat, 09.00–17.00 WIB' : 'Mon–Fri, 9AM–5PM WIB' },
           ].map((item) => (

@@ -5,7 +5,7 @@ from app.database import engine
 
 
 def setup_admin(app: FastAPI) -> None:
-    admin = Admin(app, engine, title="Phoenix Admin")
+    admin = Admin(app, engine, title="Noon Admin")
 
     from app.admin.views import (
         AddressAdmin,

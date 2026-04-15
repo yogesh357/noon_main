@@ -305,6 +305,32 @@ export const adminService = {
   /** Respond to dispute */
   respondToDispute: (disputeId: number, response: string) =>
     apiClient.patch(`/admin-panel/disputes/${disputeId}`, { admin_response: response }),
+
+  /** List products (admin view) */
+  getProducts: (params?: { page?: number; per_page?: number; search?: string }) =>
+    apiClient.get<PaginatedResponse<Product>>('/admin-panel/products', { params }),
+
+  /** Create product */
+  createProduct: (data: {
+    name_id: string
+    name_en: string
+    description_id?: string
+    description_en?: string
+    brand?: string
+    base_price: number
+    is_active?: boolean
+    category_ids?: number[]
+    variants?: Array<{ sku: string; color?: string; size?: string; variant_type?: string; price_override?: number; stock_quantity?: number; weight_grams?: number; barcode?: string }>
+    images?: Array<{ image_url: string; alt_text?: string }>
+  }) => apiClient.post<Product>('/admin-panel/products', data),
+
+  /** Update product */
+  updateProduct: (productId: number, data: Partial<{ name_id: string; name_en: string; description_id: string; description_en: string; brand: string; base_price: number; is_active: boolean }>) =>
+    apiClient.patch<Product>(`/admin-panel/products/${productId}`, data),
+
+  /** Soft-delete product */
+  deleteProduct: (productId: number) =>
+    apiClient.delete(`/admin-panel/products/${productId}`),
 }
 
 // ─── Warehouse ────────────────────────────────────────────────────────────────

@@ -53,7 +53,7 @@ def create_app() -> FastAPI:
     app.add_middleware(
         SessionMiddleware,
         secret_key=settings.secret_key,
-        session_cookie="phoenix_session",
+        session_cookie="noon_session",
         max_age=60 * 60 * 24 * 7,  # 7 days
         https_only=settings.is_production,
     )

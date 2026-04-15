@@ -66,9 +66,9 @@ export default function Navbar({ fluid = false }: { fluid?: boolean }) {
           {/* Logo */}
           <Link to="/" className="flex-shrink-0 group flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-neutral-900 flex items-center justify-center transition-transform group-hover:rotate-12">
-              <span className="text-white text-lg font-black italic">P</span>
+              <span className="text-white text-lg font-black italic">N</span>
             </div>
-            <span className="text-xl font-black tracking-tighter text-neutral-900 uppercase">PHOENIX</span>
+            <span className="text-xl font-black tracking-tighter text-neutral-900 uppercase">NOON</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -132,10 +132,11 @@ export default function Navbar({ fluid = false }: { fluid?: boolean }) {
             {/* Language toggle */}
             <button
               onClick={() => dispatch(toggleLanguage())}
-              className="hidden sm:inline-flex items-center px-3 py-1.5 text-xs font-black text-neutral-500 border border-neutral-200 rounded-xl hover:bg-neutral-50 hover:border-neutral-300 transition-all uppercase tracking-widest active:scale-95"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black text-neutral-500 border border-neutral-200 rounded-xl hover:bg-neutral-50 hover:border-neutral-300 transition-all active:scale-95"
+              title={language === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia'}
             >
-              <Languages size={14} className="mr-2 opacity-50" />
-              {language === 'id' ? 'ID' : 'EN'}
+              <Languages size={14} className="opacity-50" />
+              {language === 'id' ? 'EN' : 'Bahasa'}
             </button>
 
             {/* Account / Profile */}
@@ -259,9 +260,9 @@ export default function Navbar({ fluid = false }: { fluid?: boolean }) {
               >
                 <div className="flex items-center gap-2">
                   <Languages size={18} className="opacity-50" />
-                  {language === 'id' ? 'Swicth to English' : 'Ganti ke Indonesia'}
+                  {language === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia'}
                 </div>
-                <span className="text-primary-600 uppercase tracking-widest">{language === 'id' ? 'EN' : 'ID'}</span>
+                <span className="text-primary-600 font-bold">{language === 'id' ? '→ EN' : '→ Bahasa'}</span>
               </button>
             </div>
           </nav>

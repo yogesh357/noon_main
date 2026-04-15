@@ -48,6 +48,7 @@ import AdminOrdersPage from '../pages/admin/AdminOrdersPage'
 import AdminOrderDetailPage from '../pages/admin/AdminOrderDetailPage'
 import AdminMarketplacePage from '../pages/admin/AdminMarketplacePage'
 import AdminDisputesPage from '../pages/admin/AdminDisputesPage'
+import AdminProductsPage from '../pages/admin/AdminProductsPage'
 
 // Warehouse pages
 import WarehouseHomePage from '../pages/warehouse/WarehouseHomePage'
@@ -120,6 +121,7 @@ export const router = createBrowserRouter([
       { index: true, element: <AdminDashboardPage /> },
       { path: 'orders', element: <AdminOrdersPage /> },
       { path: 'orders/:orderId', element: <AdminOrderDetailPage /> },
+      { path: 'products', element: <AdminProductsPage /> },
       { path: 'marketplace-orders', element: <AdminMarketplacePage /> },
       { path: 'disputes', element: <AdminDisputesPage /> },
     ],
