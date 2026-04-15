@@ -18,8 +18,10 @@ async def create_xendit_invoice(
     import xendit
     from xendit.apis import InvoiceApi
 
-    xendit_client = xendit.ApiClient()
-    xendit_client.configuration.api_key["ApiKeyAuth"] = settings.xendit_api_key
+    configuration = xendit.Configuration(
+        api_key={"ApiKeyAuth": settings.xendit_api_key}
+    )
+    xendit_client = xendit.ApiClient(configuration)
 
     invoice_api = InvoiceApi(xendit_client)
 
