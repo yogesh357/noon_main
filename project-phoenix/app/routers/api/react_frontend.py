@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.auth import current_active_user, optional_current_user
+from app.config import settings
 from app.dependencies import get_db
 from app.models.catalog import Category, Product, ProductCategory, ProductImage, ProductVariant, Review
 from app.models.dispute import Dispute, DisputeStatus, DisputeType
@@ -871,8 +872,7 @@ async def api_checkout(request: Request, body: dict, db: AsyncSession = Depends(
     if not order:
         raise HTTPException(status_code=400, detail="Checkout failed")
 
-    base_url = str(request.base_url).rstrip("/")
-    success_url = f"{base_url}/order/success/{order.order_number}"
+    success_url = f"{settings.frontend_url}/order/success/{order.order_number}"
     payment = await create_xendit_invoice(db, order, success_url)
     order.payment = payment
     return {"order": _serialize_order(order), "payment_url": payment.xendit_invoice_url}

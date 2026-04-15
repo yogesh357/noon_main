@@ -144,7 +144,9 @@ def _mount_admin(app: FastAPI) -> None:
 
 
 def _mount_react_frontend(app: FastAPI) -> None:
-    if FRONTEND_DIST_DIR.exists():
+    # In development, the Vite dev server on :3000 serves the frontend.
+    # FastAPI only serves the SPA in production (when settings.debug is False).
+    if not settings.debug and FRONTEND_DIST_DIR.exists():
         assets_dir = FRONTEND_DIST_DIR / "assets"
         if assets_dir.exists():
             app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="frontend-assets")
@@ -169,12 +171,12 @@ def _mount_react_frontend(app: FastAPI) -> None:
         return
 
     @app.get("/", include_in_schema=False)
-    async def frontend_not_built():
+    async def frontend_dev_info():
         return HTMLResponse(
-            status_code=503,
+            status_code=200,
             content=(
-                "React frontend is not built yet. Run `npm install && npm run build` in "
-                "the `frontend` folder, or use the Vite dev server on http://localhost:5173."
+                "Noon API is running. "
+                "Frontend dev server: <a href='http://localhost:3000'>http://localhost:3000</a>"
             ),
         )
 

@@ -54,6 +54,9 @@ class Settings(BaseSettings):
     # Sentry
     sentry_dsn: str = ""
 
+    # Frontend
+    frontend_url: str = "http://localhost:3000"
+
     # i18n
     default_language: str = "id"
 
