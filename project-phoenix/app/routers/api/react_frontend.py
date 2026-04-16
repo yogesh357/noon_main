@@ -18,7 +18,7 @@ from app.models.catalog import Category, Product, ProductCategory, ProductImage,
 from app.models.dispute import Dispute, DisputeStatus, DisputeType
 from app.models.logistics import Shipment, TrackingEvent
 from app.models.marketplace import MarketplaceOrder
-from app.models.order import Order, OrderSource, OrderStatus, Payment, PaymentStatus
+from app.models.order import Order, OrderItem, OrderSource, OrderStatus, Payment, PaymentStatus
 from app.models.user import Address, User, UserRole
 from app.models.warehouse import HandoverBatch, HandoverItem, PackingTask, PickingTask
 from app.services.admin import bulk_process_orders, get_admin_dashboard_stats, get_admin_order_queue
@@ -61,6 +61,14 @@ from app.services.warehouse import (
 from app.utils.pdf import generate_labels_pdf
 
 router = APIRouter(tags=["react-frontend"])
+
+# Reusable eager-load chain: order items → variant → product → images
+_ORDER_ITEM_IMAGE_OPTS = [
+    selectinload(Order.items)
+    .selectinload(OrderItem.variant)
+    .selectinload(ProductVariant.product)
+    .selectinload(Product.images),
+]
 
 
 def _get_session_key(request: Request) -> str:
@@ -252,11 +260,20 @@ def _serialize_payment(payment: Payment | None) -> dict | None:
 
 
 def _serialize_order_item(item) -> dict:
+    # Resolve primary image from the eagerly-loaded variant → product → images chain
+    image_url = None
+    try:
+        images = item.variant.product.images if item.variant and item.variant.product else []
+        if images:
+            primary = next((img for img in images if img.is_primary), images[0])
+            image_url = primary.image_url
+    except Exception:
+        pass
     return {
         "id": item.id,
         "product_name": item.product_name_snapshot,
         "variant_label": item.sku_snapshot,
-        "image_url": None,
+        "image_url": image_url,
         "price": _decimal(item.unit_price),
         "quantity": item.quantity,
         "subtotal": _decimal(item.unit_price * item.quantity),
@@ -382,7 +399,11 @@ async def _get_order_for_user(db: AsyncSession, order_number: str, user: User) -
     stmt = (
         select(Order)
         .where(Order.order_number == order_number, Order.user_id == user.id)
-        .options(selectinload(Order.items), selectinload(Order.payment), selectinload(Order.shipment))
+        .options(
+            *_ORDER_ITEM_IMAGE_OPTS,
+            selectinload(Order.payment),
+            selectinload(Order.shipment),
+        )
     )
     result = await db.execute(stmt)
     order = result.scalar_one_or_none()
@@ -395,7 +416,11 @@ async def _get_order_for_admin(db: AsyncSession, order_id: int) -> Order:
     stmt = (
         select(Order)
         .where(Order.id == order_id)
-        .options(selectinload(Order.items), selectinload(Order.payment), selectinload(Order.shipment))
+        .options(
+            *_ORDER_ITEM_IMAGE_OPTS,
+            selectinload(Order.payment),
+            selectinload(Order.shipment),
+        )
     )
     result = await db.execute(stmt)
     order = result.scalar_one_or_none()

@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
+from typing import Any
 
 from sqlalchemy import (
     DateTime,
@@ -113,6 +114,9 @@ class OrderItem(Base):
     sku_snapshot: Mapped[str] = mapped_column(String(50), nullable=False)
 
     order: Mapped["Order"] = relationship(back_populates="items")
+    variant: Mapped[Any] = relationship(
+        "ProductVariant", foreign_keys=[variant_id], lazy="noload"
+    )
 
 
 class PaymentStatus(StrEnum):
