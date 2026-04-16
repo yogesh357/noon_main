@@ -872,8 +872,28 @@ async def api_checkout(request: Request, body: dict, db: AsyncSession = Depends(
     if not order:
         raise HTTPException(status_code=400, detail="Checkout failed")
 
+    # Commit the order BEFORE calling Xendit so the order is persisted
+    # even if the external payment API call fails.
+    await db.commit()
+    await db.refresh(order)
+    # Re-load items after refresh (needed for serialisation and Xendit invoice)
+    from sqlalchemy.orm import selectinload as _sl
+    from sqlalchemy import select as _select
+    order = (
+        await db.execute(
+            _select(Order)
+            .where(Order.id == order.id)
+            .options(_sl(Order.items), _sl(Order.payment))
+        )
+    ).scalar_one()
+
     success_url = f"{settings.frontend_url}/order/success/{order.order_number}"
-    payment = await create_xendit_invoice(db, order, success_url)
+    try:
+        payment = await create_xendit_invoice(db, order, success_url, payer_email=user.email)
+    except Exception as e:
+        # Order is already committed — return its number so the frontend can
+        # show the success/pending page even when the payment gateway errors.
+        raise HTTPException(status_code=502, detail=f"Payment gateway error: {e}")
     order.payment = payment
     return {"order": _serialize_order(order), "payment_url": payment.xendit_invoice_url}
 

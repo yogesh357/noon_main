@@ -1,89 +1,122 @@
 
+import asyncio
+import logging
+import traceback
 from datetime import UTC
+
+import xendit
+from xendit.apis import InvoiceApi
+from xendit.invoice.model.create_invoice_request import CreateInvoiceRequest
+from xendit.invoice.model.customer_object import CustomerObject
+from xendit.invoice.model.invoice_item import InvoiceItem
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.models.order import Order, OrderStatus, Payment, PaymentMethod, PaymentStatus
 
+logger = logging.getLogger(__name__)
+
+
+def _build_xendit_client() -> InvoiceApi:
+    configuration = xendit.Configuration()
+    configuration.api_key = settings.xendit_api_key
+    client = xendit.ApiClient(configuration)
+    return InvoiceApi(client)
+
 
 async def create_xendit_invoice(
     db: AsyncSession,
     order: Order,
     success_redirect_url: str,
+    payer_email: str = "",
 ) -> Payment:
     """Create a Xendit invoice and return the Payment record."""
-    import asyncio
-
-    import xendit
-    from xendit.apis import InvoiceApi
-
-    configuration = xendit.Configuration(
-        api_key={"ApiKeyAuth": settings.xendit_api_key}
-    )
-    xendit_client = xendit.ApiClient(configuration)
-
-    invoice_api = InvoiceApi(xendit_client)
-
-    # Build invoice items
-    items = []
-    for item in order.items:
-        items.append({
-            "name": item.product_name_snapshot,
-            "quantity": item.quantity,
-            "price": float(item.unit_price),
-        })
-
-    address = order.shipping_address or {}
-
     try:
-        # Xendit SDK is synchronous — run in thread to avoid blocking event loop
-        invoice = await asyncio.to_thread(
-            invoice_api.create_invoice,
-            create_invoice_request={
-                "external_id": order.order_number,
-                "amount": float(order.total),
-                "payer_email": "",  # Will be set from user
-                "description": f"Order {order.order_number}",
-                "invoice_duration": 1800,  # 30 minutes
-                "currency": "IDR",
-                "items": items,
-                "success_redirect_url": success_redirect_url,
-                "customer": {
-                    "given_names": address.get("full_name", ""),
-                    "mobile_number": address.get("phone", ""),
-                },
-            },
+        return await _do_create_xendit_invoice(db, order, success_redirect_url, payer_email)
+    except Exception:
+        # Print full traceback unconditionally so it always appears in terminal
+        print("=" * 60)
+        print("XENDIT ERROR — full traceback:")
+        traceback.print_exc()
+        print("=" * 60)
+        raise
+
+
+async def _do_create_xendit_invoice(
+    db: AsyncSession,
+    order: Order,
+    success_redirect_url: str,
+    payer_email: str = "",
+) -> Payment:
+    print(f"[Xendit] Starting invoice for order {order.order_number}")
+    print(f"[Xendit] API key prefix: {settings.xendit_api_key[:12]}...")
+    print(f"[Xendit] Payer email: {payer_email!r}")
+    print(f"[Xendit] Order total: {order.total}")
+    print(f"[Xendit] Items count: {len(order.items)}")
+    print(f"[Xendit] shipping_address type: {type(order.shipping_address)}")
+    print(f"[Xendit] shipping_address value: {order.shipping_address!r}")
+
+    if not settings.xendit_api_key:
+        raise RuntimeError("XENDIT_API_KEY is not set. Add it to your .env file.")
+
+    address = order.shipping_address
+    if isinstance(address, str):
+        import json
+        address = json.loads(address)
+    if not isinstance(address, dict):
+        address = {}
+
+    print(f"[Xendit] Resolved address dict: {address}")
+
+    customer = CustomerObject(
+        given_names=address.get("full_name", ""),
+        mobile_number=address.get("phone", ""),
+        email=payer_email or None,
+    )
+
+    items = [
+        InvoiceItem(
+            name=item.product_name_snapshot,
+            quantity=float(item.quantity),
+            price=float(item.unit_price),
         )
+        for item in order.items
+    ]
 
-        payment = Payment(
-            order_id=order.id,
-            xendit_invoice_id=invoice.id,
-            xendit_invoice_url=invoice.invoice_url,
-            amount=order.total,
-            status=PaymentStatus.PENDING,
-        )
-        db.add(payment)
-        await db.flush()
+    print(f"[Xendit] Built {len(items)} InvoiceItems")
 
-        return payment
+    create_request = CreateInvoiceRequest(
+        external_id=order.order_number,
+        amount=float(order.total),
+        payer_email=payer_email or None,
+        description=f"Order {order.order_number}",
+        invoice_duration=float(1800),
+        currency="IDR",
+        items=items,
+        success_redirect_url=success_redirect_url,
+        failure_redirect_url=success_redirect_url,
+        customer=customer,
+    )
 
-    except Exception as e:
-        # Fallback: create payment record without Xendit (for development/testing)
-        payment = Payment(
-            order_id=order.id,
-            xendit_invoice_id=f"dev-{order.order_number}",
-            xendit_invoice_url=success_redirect_url,  # Redirect to success in dev mode
-            amount=order.total,
-            status=PaymentStatus.PENDING,
-        )
-        db.add(payment)
-        await db.flush()
+    print("[Xendit] CreateInvoiceRequest built. Calling Xendit API...")
 
-        if settings.debug:
-            print(f"Xendit API error (using dev fallback): {e}")
+    invoice_api = _build_xendit_client()
+    invoice = await asyncio.to_thread(invoice_api.create_invoice, create_request)
 
-        return payment
+    print(f"[Xendit] SUCCESS — invoice_id={invoice.id}, url={invoice.invoice_url}")
+
+    payment = Payment(
+        order_id=order.id,
+        xendit_invoice_id=invoice.id,
+        xendit_invoice_url=invoice.invoice_url,
+        amount=order.total,
+        status=PaymentStatus.PENDING,
+    )
+    db.add(payment)
+    await db.flush()
+
+    return payment
 
 
 async def handle_xendit_webhook(
@@ -99,7 +132,6 @@ async def handle_xendit_webhook(
     if not external_id or not status:
         return False
 
-    # Find order by external_id (order_number)
     from app.services.order import get_order_by_number
 
     order = await get_order_by_number(db, external_id)
@@ -110,7 +142,6 @@ async def handle_xendit_webhook(
     payment.callback_data = payload
     payment.xendit_payment_id = payment_id
 
-    # Map payment method
     method_map = {
         "BANK_TRANSFER": PaymentMethod.VIRTUAL_ACCOUNT,
         "EWALLET": PaymentMethod.EWALLET,
@@ -121,16 +152,15 @@ async def handle_xendit_webhook(
     payment.method = method_map.get(payment_method, PaymentMethod.OTHER)
 
     if status == "PAID":
-        payment.status = PaymentStatus.PAID
         from datetime import datetime
 
+        payment.status = PaymentStatus.PAID
         payment.paid_at = datetime.now(UTC)
         order.status = OrderStatus.ACCEPTED
-        order.reserved_until = None  # No longer needs reservation
+        order.reserved_until = None
 
     elif status == "EXPIRED":
         payment.status = PaymentStatus.EXPIRED
-        # Release stock
         from app.models.catalog import ProductVariant
 
         for item in order.items:
