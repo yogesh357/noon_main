@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.models.cart import Cart
-from app.models.catalog import Product, ProductVariant
+from app.models.catalog import Product, ProductImage, ProductVariant
 from app.models.order import Order, OrderItem, OrderSource, OrderStatus
 from app.models.user import Address
 
@@ -112,11 +112,19 @@ async def create_order_from_cart(
     return order
 
 
+_ITEM_IMAGE_OPTS = (
+    selectinload(Order.items)
+    .selectinload(OrderItem.variant)
+    .selectinload(ProductVariant.product)
+    .selectinload(Product.images),
+)
+
+
 async def get_order_by_number(db: AsyncSession, order_number: str) -> Order | None:
     stmt = (
         select(Order)
         .where(Order.order_number == order_number)
-        .options(selectinload(Order.items), selectinload(Order.payment))
+        .options(*_ITEM_IMAGE_OPTS, selectinload(Order.payment))
     )
     result = await db.execute(stmt)
     return result.scalar_one_or_none()
@@ -130,7 +138,7 @@ async def get_user_orders(
     stmt = (
         select(Order)
         .where(Order.user_id == user_id)
-        .options(selectinload(Order.items), selectinload(Order.payment))
+        .options(*_ITEM_IMAGE_OPTS, selectinload(Order.payment))
         .order_by(Order.created_at.desc())
     )
     if status:

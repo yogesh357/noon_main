@@ -172,19 +172,23 @@ export default function Navbar({ fluid = false }: { fluid?: boolean }) {
                         <LayoutDashboard size={18} className="opacity-50 group-hover:opacity-100 transition-opacity" />
                         {t('My Dashboard', language)}
                       </Link>
-                      <Link to="/dashboard/orders" className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-neutral-600 hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-colors group">
-                        <ShoppingCart size={18} className="opacity-50 group-hover:opacity-100 transition-opacity" />
-                        {t('Orders', language)}
-                      </Link>
-                      <Link to="/dashboard/notifications" className="flex items-center justify-between px-3 py-2.5 text-sm font-bold text-neutral-600 hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-colors group">
-                        <div className="flex items-center gap-3">
-                          <Bell size={18} className="opacity-50 group-hover:opacity-100 transition-opacity" />
-                          {t('Notifications', language)}
-                        </div>
-                        {notificationCount > 0 && (
-                          <span className="bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">{notificationCount}</span>
-                        )}
-                      </Link>
+                      {user.role === 'CUSTOMER' && (
+                        <>
+                          <Link to="/dashboard/orders" className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-neutral-600 hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-colors group">
+                            <ShoppingCart size={18} className="opacity-50 group-hover:opacity-100 transition-opacity" />
+                            {t('Orders', language)}
+                          </Link>
+                          <Link to="/dashboard/notifications" className="flex items-center justify-between px-3 py-2.5 text-sm font-bold text-neutral-600 hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-colors group">
+                            <div className="flex items-center gap-3">
+                              <Bell size={18} className="opacity-50 group-hover:opacity-100 transition-opacity" />
+                              {t('Notifications', language)}
+                            </div>
+                            {notificationCount > 0 && (
+                              <span className="bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">{notificationCount}</span>
+                            )}
+                          </Link>
+                        </>
+                      )}
                     </div>
 
                     <div className="mt-2 pt-2 border-t border-neutral-50">
