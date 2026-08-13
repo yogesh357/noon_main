@@ -10,7 +10,7 @@ import type {
 // ─── Axios Client ─────────────────────────────────────────────────────────────
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: '/api',
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true, // send cookies (session auth)
 })

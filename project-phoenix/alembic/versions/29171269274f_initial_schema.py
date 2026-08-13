@@ -32,7 +32,7 @@ def upgrade() -> None:
     sa.Column('image_url', sa.String(length=500), nullable=True),
     sa.Column('sort_order', sa.Integer(), server_default='0', nullable=False),
     sa.Column('is_active', sa.Boolean(), server_default='true', nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.ForeignKeyConstraint(['parent_id'], ['categories.id'], ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id')
     )
@@ -50,8 +50,8 @@ def upgrade() -> None:
     sa.Column('meta_title', sa.String(length=255), nullable=True),
     sa.Column('meta_description', sa.String(length=500), nullable=True),
     sa.Column('search_vector', app.database.CompatTSVector(), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index('ix_products_search_vector', 'products', ['search_vector'], unique=False, postgresql_using='gin')
@@ -62,7 +62,7 @@ def upgrade() -> None:
     sa.Column('action', sa.String(length=50), nullable=False),
     sa.Column('status', sa.String(length=20), nullable=False),
     sa.Column('details', app.database.CompatJSON(), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('users',
@@ -71,8 +71,8 @@ def upgrade() -> None:
     sa.Column('role', sa.Enum('CUSTOMER', 'ADMIN', 'WAREHOUSE', name='userrole'), server_default='CUSTOMER', nullable=False),
     sa.Column('language_pref', sa.String(length=2), server_default='id', nullable=False),
     sa.Column('avatar_url', sa.String(length=500), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.Column('id', fastapi_users_db_sqlalchemy.generics.GUID(), nullable=False),
     sa.Column('email', sa.String(length=320), nullable=False),
     sa.Column('hashed_password', sa.String(length=1024), nullable=False),
@@ -93,7 +93,7 @@ def upgrade() -> None:
     sa.Column('province', sa.String(length=100), nullable=False),
     sa.Column('postal_code', sa.String(length=10), nullable=False),
     sa.Column('is_default', sa.Boolean(), server_default='false', nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
@@ -101,8 +101,8 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('user_id', app.database.CompatUUID(length=36), nullable=True),
     sa.Column('session_key', sa.String(length=255), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
@@ -112,7 +112,7 @@ def upgrade() -> None:
     sa.Column('courier', sa.String(length=50), nullable=True),
     sa.Column('sender_user_id', app.database.CompatUUID(length=36), nullable=True),
     sa.Column('status', sa.Enum('OPEN', 'COMPLETED', name='handoverstatus'), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.Column('completed_at', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['sender_user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -125,7 +125,7 @@ def upgrade() -> None:
     sa.Column('external_url', sa.String(length=500), nullable=True),
     sa.Column('sync_status', sa.String(length=20), nullable=False),
     sa.Column('last_synced_at', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.ForeignKeyConstraint(['product_id'], ['products.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('product_id', 'marketplace', name='uq_listing_product_marketplace')
@@ -142,7 +142,7 @@ def upgrade() -> None:
     sa.Column('is_read', sa.Boolean(), server_default='false', nullable=False),
     sa.Column('related_object_type', sa.String(length=50), nullable=True),
     sa.Column('related_object_id', sa.Integer(), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
@@ -160,8 +160,8 @@ def upgrade() -> None:
     sa.Column('notes', sa.Text(), nullable=True),
     sa.Column('reserved_until', sa.DateTime(timezone=True), nullable=True),
     sa.Column('delivered_at', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id')
     )
@@ -195,7 +195,7 @@ def upgrade() -> None:
     sa.Column('stock_quantity', sa.Integer(), server_default='0', nullable=False),
     sa.Column('weight_grams', sa.Integer(), nullable=True),
     sa.Column('is_active', sa.Boolean(), server_default='true', nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.ForeignKeyConstraint(['product_id'], ['products.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
@@ -208,7 +208,7 @@ def upgrade() -> None:
     sa.Column('rating', sa.Integer(), nullable=False),
     sa.Column('comment', sa.Text(), nullable=True),
     sa.Column('is_verified_purchase', sa.Boolean(), server_default='false', nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.ForeignKeyConstraint(['product_id'], ['products.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
@@ -217,7 +217,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('user_id', app.database.CompatUUID(length=36), nullable=False),
     sa.Column('product_id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.ForeignKeyConstraint(['product_id'], ['products.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
@@ -243,7 +243,7 @@ def upgrade() -> None:
     sa.Column('resolution_type', sa.String(length=20), nullable=True),
     sa.Column('resolution_notes', sa.Text(), nullable=True),
     sa.Column('admin_notes', sa.Text(), nullable=True),
-    sa.Column('opened_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('opened_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.Column('responded_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('resolved_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('sla_deadline', sa.DateTime(timezone=True), nullable=True),
@@ -255,7 +255,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('batch_id', sa.Integer(), nullable=False),
     sa.Column('order_id', sa.Integer(), nullable=False),
-    sa.Column('scanned_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('scanned_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.ForeignKeyConstraint(['batch_id'], ['handover_batches.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
@@ -267,7 +267,7 @@ def upgrade() -> None:
     sa.Column('raw_data', app.database.CompatJSON(), nullable=True),
     sa.Column('linked_order_id', sa.Integer(), nullable=True),
     sa.Column('status', sa.String(length=30), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.ForeignKeyConstraint(['linked_order_id'], ['orders.id'], ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('external_order_id', 'marketplace', name='uq_marketplace_order_external')
@@ -308,7 +308,7 @@ def upgrade() -> None:
     sa.Column('amount', sa.Numeric(precision=14, scale=2), nullable=False),
     sa.Column('paid_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('callback_data', app.database.CompatJSON(), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('order_id')
@@ -334,7 +334,7 @@ def upgrade() -> None:
     sa.Column('status', sa.Enum('LABEL_CREATED', 'PICKED_UP', 'IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DELIVERED', 'RETURNED', 'EXCEPTION', name='shipmentstatus'), nullable=False),
     sa.Column('estimated_delivery', sa.DateTime(timezone=True), nullable=True),
     sa.Column('actual_delivery', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('order_id')
@@ -346,7 +346,7 @@ def upgrade() -> None:
     sa.Column('file_url', sa.String(length=500), nullable=False),
     sa.Column('description', sa.Text(), nullable=True),
     sa.Column('uploaded_by', app.database.CompatUUID(length=36), nullable=False),
-    sa.Column('uploaded_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('uploaded_at', sa.DateTime(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.ForeignKeyConstraint(['dispute_id'], ['disputes.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['uploaded_by'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
