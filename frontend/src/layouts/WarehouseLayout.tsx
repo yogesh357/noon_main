@@ -40,7 +40,7 @@ export default function WarehouseLayout() {
             </div>
             <div>
               <p className="text-xs font-black text-white uppercase tracking-widest">Warehouse Ops</p>
-              <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-tighter">Noon WMS</p>
+              <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-tighter">Phoenix  WMS</p>
             </div>
           </div>
           {user && (

@@ -1,6 +1,6 @@
 # BUSINESS REQUIREMENTS DOCUMENT (BRD)
 
-**Project Name:** Noon – AI-Powered E-commerce Operating System
+**Project Name:** Phoenix  – AI-Powered E-commerce Operating System
 **Version:** 1.0
 **Date:** 2026-03-19
 **Status:** Draft
@@ -39,7 +39,7 @@
 
 ## 1. EXECUTIVE SUMMARY
 
-Noon is an AI-powered e-commerce operating system built for end-to-end commerce automation. It is not merely a storefront — it is a unified platform combining customer experience, order management, payment processing, logistics, marketing automation, and AI-driven intelligence into a single operating system.
+Phoenix  is an AI-powered e-commerce operating system built for end-to-end commerce automation. It is not merely a storefront — it is a unified platform combining customer experience, order management, payment processing, logistics, marketing automation, and AI-driven intelligence into a single operating system.
 
 The platform connects to Jubelio (OMS/inventory backbone), Xendit (payments), multiple courier APIs, and social media platforms — while layering AI on top for competitor analysis, dynamic pricing, and demand forecasting.
 
@@ -91,9 +91,9 @@ Frontend (Store + Customer Dashboard)
 | System   | Is Source of Truth For |
 |----------|----------------------|
 | **Jubelio** | Products, Inventory, Order Fulfillment |
-| **Noon**    | Customer Experience, Pre-sync Orders, Payments, AI Analytics, Marketing Automation |
+| **Phoenix **    | Customer Experience, Pre-sync Orders, Payments, AI Analytics, Marketing Automation |
 
-This split is **critical** — all product/inventory data flows from Jubelio into Noon. Orders originate in Noon and are pushed to Jubelio after payment confirmation.
+This split is **critical** — all product/inventory data flows from Jubelio into Phoenix . Orders originate in Phoenix  and are pushed to Jubelio after payment confirmation.
 
 ---
 
@@ -222,13 +222,13 @@ The wishlist is a mandatory feature with both UX and business intelligence value
 ```
 Checkout
    ↓
-Create Payment Request (Noon Backend)
+Create Payment Request (Phoenix  Backend)
    ↓
 Redirect to Xendit Payment Page
    ↓
 Customer Completes Payment
    ↓
-Xendit Webhook → Noon Backend
+Xendit Webhook → Phoenix  Backend
    ↓
 Verify Webhook Signature
    ↓
@@ -277,14 +277,14 @@ Shipped → Dispute Raised → Under Review → Resolved / Closed
 #### Integration Functions
 | Function | Direction | Trigger |
 |---------|-----------|---------|
-| Pull products | Jubelio → Noon | Scheduled sync / manual |
-| Pull inventory | Jubelio → Noon | Real-time / scheduled |
-| Push orders | Noon → Jubelio | After payment confirmed |
-| Receive order updates | Jubelio → Noon | Webhook / polling |
+| Pull products | Jubelio → Phoenix  | Scheduled sync / manual |
+| Pull inventory | Jubelio → Phoenix  | Real-time / scheduled |
+| Push orders | Phoenix  → Jubelio | After payment confirmed |
+| Receive order updates | Jubelio → Phoenix  | Webhook / polling |
 
 #### Sync Rules
-- Product data in Noon is always overwritten by Jubelio data on sync
-- Inventory levels are never manually edited in Noon
+- Product data in Phoenix  is always overwritten by Jubelio data on sync
+- Inventory levels are never manually edited in Phoenix 
 - Orders pushed to Jubelio include full customer, item, and payment data
 - Sync failures must be logged, alerted, and retried
 
@@ -397,7 +397,7 @@ Instagram, Facebook, Twitter/X, LinkedIn, Pinterest
 #### Engine Behavior
 - Runs on configurable schedule (e.g., daily)
 - Stores historical price data for trend analysis
-- Alerts admin when competitor price drops below Noon's price
+- Alerts admin when competitor price drops below Phoenix 's price
 
 ---
 
@@ -481,7 +481,7 @@ Customer DMs on social platform
        ↓
 Agent responds, captures order details
        ↓
-Manual order created in Noon
+Manual order created in Phoenix 
        ↓
 Payment link sent (Xendit)
        ↓
@@ -529,7 +529,7 @@ Ticket closed
 - Jubelio sync is always async (queue-based, not real-time blocking)
 - Xendit webhooks are verified before any order state change
 - All external API failures must be logged and retried
-- Frontend communicates only with Noon's backend — no direct third-party calls from browser
+- Frontend communicates only with Phoenix 's backend — no direct third-party calls from browser
 
 ---
 
@@ -570,7 +570,7 @@ Ticket closed
 | Risk | Impact | Mitigation |
 |------|--------|-----------|
 | API limitations (Jubelio/courier) | High | Rate limiting + queue-based sync with retry |
-| Data inconsistency (Noon vs Jubelio) | High | Reconciliation job + alert on mismatch |
+| Data inconsistency (Phoenix  vs Jubelio) | High | Reconciliation job + alert on mismatch |
 | Sync failures | Medium | Dead-letter queue + admin alert |
 | Payment webhook issues | High | Idempotency keys + manual reconciliation tool |
 | Competitor data unavailability | Medium | Fallback to cached data + alert |

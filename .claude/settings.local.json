@@ -1,7 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ls c:/Users/ACER/Downloads/noon-main/project-phoenix/.env*)",
+      "Bash(ls c:/Users/ACER/Downloads/phoenix -main/project-phoenix/.env*)",
       "Bash(pip install:*)",
       "Bash(alembic revision:*)",
       "Bash(python -c ' *)",

@@ -4,15 +4,15 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { logout } from '../../features/auth/authSlice'
 import { toggleLanguage, setSearchOpen } from '../../features/ui/uiSlice'
 import { t } from '../../utils/i18n'
-import { 
-  Search, 
-  Languages, 
-  User, 
-  ShoppingBag, 
-  Menu, 
-  X, 
-  LogOut, 
-  LayoutDashboard, 
+import {
+  Search,
+  Languages,
+  User,
+  ShoppingBag,
+  Menu,
+  X,
+  LogOut,
+  LayoutDashboard,
   Bell,
   ShoppingCart,
   ChevronDown
@@ -66,9 +66,9 @@ export default function Navbar({ fluid = false }: { fluid?: boolean }) {
           {/* Logo */}
           <Link to="/" className="flex-shrink-0 group flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-neutral-900 flex items-center justify-center transition-transform group-hover:rotate-12">
-              <span className="text-white text-lg font-black italic">N</span>
+              <span className="text-white text-lg font-black italic">P</span>
             </div>
-            <span className="text-xl font-black tracking-tighter text-neutral-900 uppercase">NOON</span>
+            <span className="text-xl font-black tracking-tighter text-neutral-900 uppercase">Phoenix</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -80,9 +80,9 @@ export default function Navbar({ fluid = false }: { fluid?: boolean }) {
                 { label: 'FAQ', to: '/faq' },
                 { label: 'Contact', to: '/contact' }
               ].map((item) => (
-                <Link 
+                <Link
                   key={item.to}
-                  to={item.to} 
+                  to={item.to}
                   className="px-4 py-2 text-sm font-bold text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 rounded-xl transition-all"
                 >
                   {t(item.label, language)}
@@ -105,8 +105,8 @@ export default function Navbar({ fluid = false }: { fluid?: boolean }) {
                   autoFocus
                 />
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => setSearchVisible(false)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-900 transition-colors p-1"
                 >
@@ -120,7 +120,7 @@ export default function Navbar({ fluid = false }: { fluid?: boolean }) {
           <div className="flex items-center space-x-1 sm:space-x-2">
             {/* Search toggle */}
             {!searchVisible && (
-              <button 
+              <button
                 onClick={() => { setSearchVisible(true); setMobileOpen(false) }}
                 className="p-2.5 text-neutral-500 hover:text-neutral-900 rounded-xl hover:bg-neutral-50 transition-all active:scale-95"
                 aria-label="Search"
@@ -142,7 +142,7 @@ export default function Navbar({ fluid = false }: { fluid?: boolean }) {
             {/* Account / Profile */}
             {user ? (
               <div className="relative" onClick={(e) => e.stopPropagation()}>
-                <button 
+                <button
                   onClick={() => setProfileOpen(!profileOpen)}
                   className="flex items-center gap-2 p-1.5 pr-2.5 bg-neutral-100 hover:bg-neutral-200 rounded-2xl transition-all group active:scale-95"
                 >
@@ -166,7 +166,7 @@ export default function Navbar({ fluid = false }: { fluid?: boolean }) {
                       <p className="text-sm font-black text-neutral-900 truncate">{user.full_name}</p>
                       <p className="text-[10px] text-neutral-500 truncate font-bold uppercase tracking-widest">{user.email}</p>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 gap-0.5">
                       <Link to={getDashboardLink()} className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-neutral-600 hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-colors group">
                         <LayoutDashboard size={18} className="opacity-50 group-hover:opacity-100 transition-opacity" />
@@ -192,7 +192,7 @@ export default function Navbar({ fluid = false }: { fluid?: boolean }) {
                     </div>
 
                     <div className="mt-2 pt-2 border-t border-neutral-50">
-                      <button 
+                      <button
                         onClick={handleLogout}
                         className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-black text-rose-500 hover:bg-rose-50 rounded-xl transition-colors group"
                       >
@@ -204,8 +204,8 @@ export default function Navbar({ fluid = false }: { fluid?: boolean }) {
                 )}
               </div>
             ) : (
-              <Link 
-                to="/auth/login" 
+              <Link
+                to="/auth/login"
                 className="p-2.5 text-neutral-500 hover:text-neutral-900 rounded-xl hover:bg-neutral-50 transition-all active:scale-95"
               >
                 <User size={20} />
@@ -213,9 +213,9 @@ export default function Navbar({ fluid = false }: { fluid?: boolean }) {
             )}
 
             {/* Cart */}
-            <Link 
-              to="/cart" 
-              className="relative p-2.5 text-neutral-500 hover:text-neutral-900 rounded-xl hover:bg-neutral-50 transition-all group active:scale-95" 
+            <Link
+              to="/cart"
+              className="relative p-2.5 text-neutral-500 hover:text-neutral-900 rounded-xl hover:bg-neutral-50 transition-all group active:scale-95"
               aria-label="Cart"
             >
               <ShoppingBag size={20} className="group-hover:rotate-6 transition-transform" />
@@ -227,7 +227,7 @@ export default function Navbar({ fluid = false }: { fluid?: boolean }) {
             </Link>
 
             {/* Mobile menu toggle */}
-            <button 
+            <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className="lg:hidden p-2.5 text-neutral-500 hover:text-neutral-900 rounded-xl hover:bg-neutral-50 transition-all active:scale-95"
             >
@@ -247,18 +247,18 @@ export default function Navbar({ fluid = false }: { fluid?: boolean }) {
               { label: 'FAQ', to: '/faq' },
               { label: 'Contact', to: '/contact' }
             ].map((item) => (
-              <Link 
+              <Link
                 key={item.to}
-                to={item.to} 
-                onClick={() => setMobileOpen(false)} 
+                to={item.to}
+                onClick={() => setMobileOpen(false)}
                 className="block py-3 px-4 rounded-2xl text-base font-black text-neutral-600 hover:bg-primary-50 hover:text-primary-700 transition-all"
               >
                 {t(item.label, language)}
               </Link>
             ))}
-            
+
             <div className="pt-4 mt-4 border-t border-neutral-50">
-              <button 
+              <button
                 onClick={() => { dispatch(toggleLanguage()); setMobileOpen(false) }}
                 className="w-full flex items-center justify-between py-3 px-4 bg-neutral-50 rounded-2xl text-sm font-black text-neutral-600"
               >

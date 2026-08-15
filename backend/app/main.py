@@ -54,7 +54,7 @@ def create_app() -> FastAPI:
     app.add_middleware(
         SessionMiddleware,
         secret_key=settings.secret_key,
-        session_cookie="noon_session",
+        session_cookie="phoenix _session",
         max_age=60 * 60 * 24 * 7,  # 7 days
         https_only=settings.is_production,
     )
@@ -176,7 +176,7 @@ def _mount_react_frontend(app: FastAPI) -> None:
         return HTMLResponse(
             status_code=200,
             content=(
-                "Noon API is running. "
+                "Phoenix  API is running. "
             ),
         )
 
