@@ -85,12 +85,12 @@ export default function AdminOrdersPage() {
           </h1>
           <p className="text-neutral-500 text-sm">Manage and process your incoming orders.</p>
         </header>
-        
+
         <div className="flex items-center gap-3">
           {selected.size > 0 && (
-            <button 
-              onClick={bulkProcess} 
-              disabled={processing} 
+            <button
+              onClick={bulkProcess}
+              disabled={processing}
               className="btn-primary"
             >
               {processing ? (
@@ -117,11 +117,11 @@ export default function AdminOrdersPage() {
               <thead>
                 <tr className="bg-neutral-50/50 border-b border-neutral-100">
                   <th className="px-6 py-4 text-left w-10">
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       checked={selected.size === orders.length && orders.length > 0}
-                      onChange={toggleSelectAll} 
-                      className="rounded border-neutral-300 text-primary-600 focus:ring-primary-500 transition-all" 
+                      onChange={toggleSelectAll}
+                      className="rounded border-neutral-300 text-primary-600 focus:ring-primary-500 transition-all"
                     />
                   </th>
                   <th className="px-6 py-4 text-left font-semibold text-neutral-600 uppercase tracking-wider text-[10px]">Order Details</th>
@@ -135,11 +135,11 @@ export default function AdminOrdersPage() {
                 {orders.map((order) => (
                   <tr key={order.id} className="data-table-row group">
                     <td className="px-6 py-4">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         checked={selected.has(order.id)}
-                        onChange={() => toggleSelect(order.id)} 
-                        className="rounded border-neutral-300 text-primary-600 focus:ring-primary-500 transition-all" 
+                        onChange={() => toggleSelect(order.id)}
+                        className="rounded border-neutral-300 text-primary-600 focus:ring-primary-500 transition-all"
                       />
                     </td>
                     <td className="px-6 py-4">
@@ -147,7 +147,7 @@ export default function AdminOrdersPage() {
                         <Link to={`/admin-panel/orders/${order.id}`} className="font-bold text-neutral-900 hover:text-primary-600 transition-colors">
                           #{order.order_number}
                         </Link>
-                        <span className="text-xs text-neutral-400 mt-0.5">{new Date(order.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                        <span className="text-xs text-neutral-400 mt-0.5">{new Date(order.created_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 hidden md:table-cell">
@@ -162,7 +162,7 @@ export default function AdminOrdersPage() {
                     </td>
                     <td className="px-6 py-4 text-right font-black text-neutral-900">{formatIDR(order.total)}</td>
                     <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                      <div className="flex items-center justify-end gap-2 transition-all duration-300">
                         <Link to={`/admin-panel/orders/${order.id}`} className="p-2 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 transition-colors">
                           <span className="text-xs font-bold uppercase tracking-tighter">View</span>
                         </Link>
@@ -180,9 +180,9 @@ export default function AdminOrdersPage() {
       </div>
 
       <div className="flex items-center justify-between pt-4">
-        <button 
-          disabled={page === 1} 
-          onClick={() => setPage(page - 1)} 
+        <button
+          disabled={page === 1}
+          onClick={() => setPage(page - 1)}
           className="btn-secondary px-4 py-2 text-xs"
         >
           Previous
@@ -192,9 +192,9 @@ export default function AdminOrdersPage() {
             Page {page}
           </span>
         </div>
-        <button 
-          disabled={orders.length < 10} 
-          onClick={() => setPage(page + 1)} 
+        <button
+          disabled={orders.length < 10}
+          onClick={() => setPage(page + 1)}
           className="btn-secondary px-4 py-2 text-xs"
         >
           Next
