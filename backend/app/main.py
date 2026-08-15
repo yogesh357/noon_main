@@ -33,11 +33,9 @@ def create_app() -> FastAPI:
     )
 
     # Middleware (order matters — last added = first executed)
-    from app.middleware.i18n import I18nMiddleware
     from app.middleware.security import SecurityHeadersMiddleware
 
     app.add_middleware(SecurityHeadersMiddleware)
-    app.add_middleware(I18nMiddleware)
     app.add_middleware(
         CORSMiddleware,
         # allow_origins=[

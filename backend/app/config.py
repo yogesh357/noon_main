@@ -57,9 +57,6 @@ class Settings(BaseSettings):
     # Frontend
     frontend_url: str = "http://localhost:3000"
 
-    # i18n
-    default_language: str = "id"
-
     @property
     def is_production(self) -> bool:
         return self.app_env == "production"

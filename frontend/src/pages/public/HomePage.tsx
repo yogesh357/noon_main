@@ -8,7 +8,6 @@ import ProductCardSkeleton from '../../components/catalog/ProductCardSkeleton'
 
 export default function HomePage() {
   const dispatch = useAppDispatch()
-  const { language } = useAppSelector((s) => s.ui)
   const { products, categories, loading } = useAppSelector((s) => s.catalog)
 
   useEffect(() => {
@@ -23,26 +22,20 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold text-brand-red uppercase tracking-widest mb-4">
-              {language === 'id' ? 'Koleksi Terbaru' : 'New Collection'}
+              New Collection
             </p>
             <h1 className="text-4xl lg:text-6xl font-bold text-neutral-900 leading-tight">
-              {language === 'id' ? (
-                <>Temukan <span className="text-brand-red">Gaya</span> Sempurnamu</>
-              ) : (
-                <>Discover Your <span className="text-brand-red">Perfect Style</span></>
-              )}
+              Discover Your <span className="text-brand-red">Perfect Style</span>
             </h1>
             <p className="mt-6 text-lg text-neutral-600 leading-relaxed">
-              {language === 'id'
-                ? 'Produk berkualitas premium yang dikurasi khusus untuk Anda. Belanja dengan percaya diri — gratis ongkos kirim, pengembalian mudah.'
-                : 'Premium quality products curated for you. Shop with confidence — free shipping, easy returns.'}
+              Premium quality products curated for you. Shop with confidence — free shipping, easy returns.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link to="/products" className="btn-primary px-8 py-3.5">
-                {language === 'id' ? 'Belanja Sekarang' : 'Shop Now'}
+                Shop Now
               </Link>
               <Link to="/about" className="btn-secondary px-8 py-3.5">
-                {language === 'id' ? 'Tentang Kami' : 'Our Story'}
+                Our Story
               </Link>
             </div>
           </div>
@@ -57,10 +50,10 @@ export default function HomePage() {
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="flex items-center justify-between mb-10">
             <h2 className="text-2xl font-semibold text-neutral-900">
-              {language === 'id' ? 'Belanja Berdasarkan Kategori' : 'Shop by Category'}
+              Shop by Category
             </h2>
             <Link to="/products" className="text-sm text-brand-red hover:text-brand-red-dark font-medium">
-              {language === 'id' ? 'Lihat Semua →' : 'View All →'}
+              View All →
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
@@ -78,7 +71,7 @@ export default function HomePage() {
                   </div>
                 </div>
                 <p className="text-sm font-medium text-neutral-700 group-hover:text-neutral-900 transition-colors">
-                  {getCategoryName(cat, language)}
+                  {getCategoryName(cat)}
                 </p>
               </Link>
             ))}
@@ -91,10 +84,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-10">
             <h2 className="text-2xl font-semibold text-neutral-900">
-              {t('New Arrivals', language)}
+              {t('New Arrivals')}
             </h2>
             <Link to="/products?sort=newest" className="text-sm text-brand-red hover:text-brand-red-dark font-medium">
-              {language === 'id' ? 'Lihat Semua →' : 'View All →'}
+              View All →
             </Link>
           </div>
           {loading ? (
@@ -107,7 +100,7 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="text-center py-12 text-neutral-400">
-              {language === 'id' ? 'Produk segera hadir' : 'Products coming soon'}
+              Products coming soon
             </div>
           )}
         </div>
@@ -117,9 +110,9 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
           {[
-            { icon: '🚚', title: language === 'id' ? 'Gratis Ongkir' : 'Free Shipping', desc: language === 'id' ? 'Untuk pembelian di atas minimum' : 'On qualifying orders' },
-            { icon: '↩️', title: language === 'id' ? 'Pengembalian Mudah' : 'Easy Returns', desc: language === 'id' ? 'Pengembalian dalam 30 hari' : '30-day return policy' },
-            { icon: '🔒', title: language === 'id' ? 'Pembayaran Aman' : 'Secure Payment', desc: language === 'id' ? 'Transaksi aman & terenkripsi' : 'Safe & encrypted transactions' },
+            { icon: '🚚', title: 'Free Shipping', desc: 'On qualifying orders' },
+            { icon: '↩️', title: 'Easy Returns', desc: '30-day return policy' },
+            { icon: '🔒', title: 'Secure Payment', desc: 'Safe & encrypted transactions' },
           ].map((item) => (
             <div key={item.title} className="p-6">
               <div className="text-4xl mb-4">{item.icon}</div>

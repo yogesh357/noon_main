@@ -74,8 +74,8 @@ export default function AdminDashboardPage() {
                       <span className="text-sm font-bold text-neutral-900">{count}</span>
                     </div>
                     <div className="w-full bg-neutral-100 h-1.5 rounded-full overflow-hidden">
-                      <div 
-                        className="bg-primary-500 h-full rounded-full transition-all duration-1000" 
+                      <div
+                        className="bg-primary-500 h-full rounded-full transition-all duration-1000"
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
@@ -88,7 +88,7 @@ export default function AdminDashboardPage() {
 
         <div className="elevated-card h-fit">
           <h2 className="text-lg font-bold text-neutral-900 mb-4 flex items-center gap-2">
-            快速操作 Quick Actions
+            Quick Actions
           </h2>
           <div className="space-y-2">
             <button className="w-full sidebar-link border border-transparent hover:border-primary-100">
