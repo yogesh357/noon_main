@@ -31,7 +31,7 @@ async def seed():
             is_active=True, is_superuser=True, is_verified=True,
         )
         warehouse = User(
-            id=uuid4(), email="gudang@phoenix.id", hashed_password=SEEDED_PASSWORD_HASH,
+            id=uuid4(), email=" ", hashed_password=SEEDED_PASSWORD_HASH,
             full_name="Staff Gudang", phone="081200000002", role=UserRole.WAREHOUSE,
             is_active=True, is_superuser=False, is_verified=True,
         )

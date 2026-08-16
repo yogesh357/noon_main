@@ -9,9 +9,9 @@ export default function CheckoutLayout() {
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-neutral-900 flex items-center justify-center">
-              <span className="text-white text-sm font-black italic">N</span>
+              <span className="text-white text-sm font-black italic">P  </span>
             </div>
-            <span className="text-xl font-black tracking-tighter text-neutral-900 uppercase">NOON</span>
+            <span className="text-xl font-black tracking-tighter text-neutral-900 uppercase">Phoenix</span>
           </Link>
           <div className="flex items-center gap-2 text-sm text-neutral-500">
             <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

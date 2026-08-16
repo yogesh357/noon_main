@@ -1,7 +1,7 @@
 // ─── Auth & Users ────────────────────────────────────────────────────────────
 
 export type UserRole = 'CUSTOMER' | 'ADMIN' | 'WAREHOUSE'
-export type Language = 'id' | 'en'
+export type Language = 'en' | 'id'
 
 export interface User {
   id: string

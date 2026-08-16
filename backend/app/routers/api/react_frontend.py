@@ -636,14 +636,6 @@ async def api_stock_status(product_id: int, db: AsyncSession = Depends(get_db)):
     return {"in_stock": total_stock > 0, "total_stock": total_stock}
 
 
-@router.post("/api/language")
-async def api_set_language(request: Request, body: dict):
-    language = body.get("language", "id")
-    if language not in {"id", "en"}:
-        language = "id"
-    request.session["language"] = language
-    return {"language": language}
-
 
 @router.get("/api/dashboard/overview")
 async def api_dashboard_overview(db: AsyncSession = Depends(get_db), user: User = Depends(current_active_user)):

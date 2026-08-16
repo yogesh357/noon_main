@@ -11,7 +11,7 @@ export default function CheckoutPage() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { cart } = useAppSelector((s) => s.cart)
-  const { user } = useAppSelector((s) => s.auth)
+  const { user, loading: authLoading } = useAppSelector((s) => s.auth)
   const { language } = useAppSelector((s) => s.ui)
 
   const [addresses, setAddresses] = useState<Address[]>([])
@@ -23,6 +23,7 @@ export default function CheckoutPage() {
   const [loadingRates, setLoadingRates] = useState(false)
 
   useEffect(() => {
+    if (authLoading) return
     if (!user) { navigate('/auth/login', { state: { from: '/checkout' } }); return }
     dispatch(fetchCart())
     dashboardService.getAddresses().then(({ data }) => {
@@ -30,7 +31,7 @@ export default function CheckoutPage() {
       const def = data.find((a) => a.is_default) ?? data[0]
       if (def) setSelectedAddressId(def.id)
     })
-  }, [user])
+  }, [user, authLoading])
 
   useEffect(() => {
     if (!selectedAddressId) return
@@ -61,6 +62,14 @@ export default function CheckoutPage() {
     }
   }
 
+  if (authLoading) {
+    return (
+      <div className="min-h-[50vh] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-neutral-200 border-t-neutral-900 rounded-full animate-spin" />
+      </div>
+    )
+  }
+
   const items = cart?.items ?? []
   const subtotal = cart?.subtotal ?? 0
   const shippingCost = selectedRate?.cost ?? 0
@@ -87,9 +96,8 @@ export default function CheckoutPage() {
               </h2>
               <div className="space-y-3">
                 {addresses.map((addr) => (
-                  <label key={addr.id} className={`flex gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
-                    selectedAddressId === addr.id ? 'border-brand-red bg-brand-red/5' : 'border-neutral-200 hover:border-neutral-300'
-                  }`}>
+                  <label key={addr.id} className={`flex gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${selectedAddressId === addr.id ? 'border-brand-red bg-brand-red/5' : 'border-neutral-200 hover:border-neutral-300'
+                    }`}>
                     <input type="radio" name="address" value={addr.id}
                       checked={selectedAddressId === addr.id}
                       onChange={() => setSelectedAddressId(addr.id)}
@@ -122,11 +130,10 @@ export default function CheckoutPage() {
               ) : shippingRates.length > 0 ? (
                 <div className="space-y-2">
                   {shippingRates.map((rate, i) => (
-                    <label key={i} className={`flex items-center justify-between p-3.5 rounded-xl border cursor-pointer transition-colors ${
-                      selectedRate?.service === rate.service && selectedRate?.courier === rate.courier
+                    <label key={i} className={`flex items-center justify-between p-3.5 rounded-xl border cursor-pointer transition-colors ${selectedRate?.service === rate.service && selectedRate?.courier === rate.courier
                         ? 'border-brand-red bg-brand-red/5'
                         : 'border-neutral-200 hover:border-neutral-300'
-                    }`}>
+                      }`}>
                       <div className="flex items-center gap-3">
                         <input type="radio" name="shipping" value={`${rate.courier}-${rate.service}`}
                           checked={selectedRate?.service === rate.service && selectedRate?.courier === rate.courier}

@@ -21,7 +21,7 @@ const normalizeUser = (user: Record<string, unknown>): User => ({
   full_name: String(user.full_name ?? ''),
   phone: typeof user.phone === 'string' ? user.phone : undefined,
   avatar_url: typeof user.avatar_url === 'string' ? user.avatar_url : undefined,
-  language: (user.language ?? user.language_pref ?? 'id') as User['language'],
+  language: 'en',
   role: String(user.role ?? 'customer').toUpperCase() as User['role'],
   is_verified: Boolean(user.is_verified),
   is_active: Boolean(user.is_active),
@@ -373,11 +373,5 @@ export const warehouseService = {
     apiClient.post<HandoverBatch>(`/warehouse/handover/complete/${batchId}`),
 }
 
-// ─── Language ─────────────────────────────────────────────────────────────────
-
-export const languageService = {
-  toggle: (lang: 'id' | 'en') =>
-    apiClient.post('/language', { language: lang }),
-}
 
 export default apiClient

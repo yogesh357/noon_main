@@ -84,7 +84,7 @@ export default function AdminMarketplacePage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <span className="text-neutral-500 font-medium">
-                        {new Date(o.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {new Date(o.created_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </span>
                     </td>
                   </tr>

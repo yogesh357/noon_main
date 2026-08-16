@@ -21,12 +21,21 @@ const navItems = [
 
 export default function WarehouseLayout() {
   const navigate = useNavigate()
-  const { user } = useAppSelector((s) => s.auth)
+  const { user, loading } = useAppSelector((s) => s.auth)
 
   useEffect(() => {
+    if (loading) return
     if (!user) navigate('/auth/login', { replace: true })
     else if (user.role !== 'WAREHOUSE' && user.role !== 'ADMIN') navigate('/', { replace: true })
-  }, [user])
+  }, [user, loading])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-950">
+        <div className="w-8 h-8 border-4 border-neutral-800 border-t-rose-500 rounded-full animate-spin" />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white flex flex-col font-sans selection:bg-primary-500/30">

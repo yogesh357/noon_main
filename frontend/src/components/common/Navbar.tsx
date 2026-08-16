@@ -2,11 +2,10 @@ import { useState, useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { logout } from '../../features/auth/authSlice'
-import { toggleLanguage, setSearchOpen } from '../../features/ui/uiSlice'
+import { setSearchOpen } from '../../features/ui/uiSlice'
 import { t } from '../../utils/i18n'
 import {
   Search,
-  Languages,
   User,
   ShoppingBag,
   Menu,
@@ -129,15 +128,7 @@ export default function Navbar({ fluid = false }: { fluid?: boolean }) {
               </button>
             )}
 
-            {/* Language toggle */}
-            <button
-              onClick={() => dispatch(toggleLanguage())}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black text-neutral-500 border border-neutral-200 rounded-xl hover:bg-neutral-50 hover:border-neutral-300 transition-all active:scale-95"
-              title={language === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia'}
-            >
-              <Languages size={14} className="opacity-50" />
-              {language === 'id' ? 'EN' : 'Bahasa'}
-            </button>
+
 
             {/* Account / Profile */}
             {user ? (
@@ -257,18 +248,7 @@ export default function Navbar({ fluid = false }: { fluid?: boolean }) {
               </Link>
             ))}
 
-            <div className="pt-4 mt-4 border-t border-neutral-50">
-              <button
-                onClick={() => { dispatch(toggleLanguage()); setMobileOpen(false) }}
-                className="w-full flex items-center justify-between py-3 px-4 bg-neutral-50 rounded-2xl text-sm font-black text-neutral-600"
-              >
-                <div className="flex items-center gap-2">
-                  <Languages size={18} className="opacity-50" />
-                  {language === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia'}
-                </div>
-                <span className="text-primary-600 font-bold">{language === 'id' ? '→ EN' : '→ Bahasa'}</span>
-              </button>
-            </div>
+
           </nav>
         </div>
       )}

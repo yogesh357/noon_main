@@ -10,7 +10,7 @@ interface UIState {
 }
 
 const initialState: UIState = {
-  language: (localStorage.getItem('language') as Language) ?? 'id',
+  language: 'en',
   notificationCount: 0,
   searchOpen: false,
   mobileMenuOpen: false,
@@ -24,10 +24,6 @@ const uiSlice = createSlice({
     setLanguage(state, action: PayloadAction<Language>) {
       state.language = action.payload
       localStorage.setItem('language', action.payload)
-    },
-    toggleLanguage(state) {
-      state.language = state.language === 'id' ? 'en' : 'id'
-      localStorage.setItem('language', state.language)
     },
     setNotificationCount(state, action: PayloadAction<number>) {
       state.notificationCount = action.payload
@@ -51,7 +47,7 @@ const uiSlice = createSlice({
 })
 
 export const {
-  setLanguage, toggleLanguage, setNotificationCount,
+  setLanguage, setNotificationCount,
   decrementNotificationCount, setSearchOpen, setMobileMenuOpen,
   showToast, clearToast,
 } = uiSlice.actions
