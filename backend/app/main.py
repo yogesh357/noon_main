@@ -90,9 +90,9 @@ def _register_routers(app: FastAPI) -> None:
 
     app.include_router(payments_api.router)
 
-    from app.routers.api import react_frontend as react_frontend_api
+    from app.routers.api import router as api_router
 
-    app.include_router(react_frontend_api.router)
+    app.include_router(api_router)
 
     # Auth API routes (fastapi-users)
     from app.auth import bearer_backend, cookie_backend, fastapi_users
