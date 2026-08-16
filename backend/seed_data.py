@@ -70,10 +70,22 @@ async def seed():
         # ============ CATEGORIES ============
         print("Creating categories...")
 
-        cat_kacamata = Category(name_id="Kacamata", name_en="Eyeglasses", slug="kacamata", sort_order=1)
-        cat_sunglasses = Category(name_id="Kacamata Hitam", name_en="Sunglasses", slug="sunglasses", sort_order=2)
-        cat_lensa = Category(name_id="Lensa Kontak", name_en="Contact Lenses", slug="lensa-kontak", sort_order=3)
-        cat_aksesoris = Category(name_id="Aksesoris", name_en="Accessories", slug="aksesoris", sort_order=4)
+        cat_kacamata = Category(
+            name_id="Kacamata", name_en="Eyeglasses", slug="kacamata", sort_order=1,
+            image_url="https://images.unsplash.com/photo-1591076482161-42ce6da69f67?w=600"
+        )
+        cat_sunglasses = Category(
+            name_id="Kacamata Hitam", name_en="Sunglasses", slug="sunglasses", sort_order=2,
+            image_url="https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600"
+        )
+        cat_lensa = Category(
+            name_id="Lensa Kontak", name_en="Contact Lenses", slug="lensa-kontak", sort_order=3,
+            image_url="https://images.unsplash.com/photo-1516257984-b1b4d707412e?w=600"
+        )
+        cat_aksesoris = Category(
+            name_id="Aksesoris", name_en="Accessories", slug="aksesoris", sort_order=4,
+            image_url="https://images.unsplash.com/photo-1625591340248-6d289000f96a?w=600"
+        )
         db.add_all([cat_kacamata, cat_sunglasses, cat_lensa, cat_aksesoris])
         await db.flush()
 
