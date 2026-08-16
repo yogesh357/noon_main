@@ -118,6 +118,7 @@ def _serialize_category(category: Category) -> dict:
         "description_id": None,
         "description_en": None,
         "parent_id": category.parent_id,
+        "image_url": category.image_url,
         "children": [_serialize_category(child) for child in (category.children if children_loaded else [])],
     }
 

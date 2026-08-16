@@ -38,6 +38,7 @@ export interface Category {
   description_id?: string
   description_en?: string
   parent_id?: number
+  image_url?: string
   children?: Category[]
 }
 
