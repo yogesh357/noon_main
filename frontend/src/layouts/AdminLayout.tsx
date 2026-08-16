@@ -23,12 +23,21 @@ const navItems = [
 
 export default function AdminLayout() {
   const navigate = useNavigate()
-  const { user } = useAppSelector((s) => s.auth)
+  const { user, loading } = useAppSelector((s) => s.auth)
 
   useEffect(() => {
+    if (loading) return
     if (!user) navigate('/auth/login', { replace: true })
     else if (user.role !== 'ADMIN') navigate('/', { replace: true })
-  }, [user])
+  }, [user, loading])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+        <div className="w-8 h-8 border-4 border-neutral-200 border-t-neutral-900 rounded-full animate-spin" />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-neutral-50/50">
